@@ -51,4 +51,23 @@ cylinder3.Pose = mat3;
 addCollision(robot.Bodies{1},cylinder1);
 addCollision(robot.Bodies{2},cylinder2);
 addCollision(robot.Bodies{3},cylinder3);
-show(robot,'Collisions','on','Visuals','off');
+show(robot,'Collisions','on');
+%% animate
+framesPerSecond = 15;
+r = rateControl(framesPerSecond);
+config = homeConfiguration(robot);
+
+for i = 1:50
+    config(1).JointPosition = config(1).JointPosition + 0.02;
+    config(2).JointPosition = config(2).JointPosition + 0.02;
+
+    % On the left subplot, preserve all previous
+    % drawings, on the right subplot, only keep the
+    % most recent drawing. Note the 'Parent' parameter
+    % selects in which axis the robot is drawn
+    show(robot, config, 'PreservePlot', false, 'Parent', subplot(1,2,1));
+    show(robot, config, 'Parent', subplot(1,2,2));
+    hold on
+    drawnow
+    waitfor(r);
+end
