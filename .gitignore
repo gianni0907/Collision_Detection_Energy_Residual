@@ -1,4 +1,4 @@
-
+source/*.pdf
 *.asv
 source/slprj/*
 *.slxc
