@@ -17,6 +17,7 @@ end
 
 % initialization
 w = zeros(3,n+1);
+wa = zeros(3,n+1);
 dw = zeros(3,n+1);
 a = zeros(3,n+1)-[[0 0 -g0]' zeros(3,n)];
 ac = zeros(3,n+1);
@@ -27,12 +28,14 @@ u = zeros(n,1);
 % forward recursion
 for i = 2:n+1
    w(:,i) = R(:,:,i-1)'*(w(:,i-1)+dq(i-1)*[0 0 1]');
-   dw(:,i) = R(:,:,i-1)'*(dw(:,i-1)+ddq(i-1)*[0 0 1]'+cross(dq(i-1)*w(:,i-1),[0 0 1]'));
-   a(:,i) = R(:,:,i-1)'*a(:,i-1)+cross(dw(:,i),p(:,i-1))+cross(w(:,i),cross(w(:,i),p(:,i-1)));
-   ac(:,i) = a(:,i)+cross(dw(:,i),pc(:,i-1))+cross(w(:,i),cross(w(:,i),pc(:,i-1)));
+   wa(:,i) = R(:,:,i-1)'*(wa(:,i-1)+v(i-1)*[0 0 1]');
+   dw(:,i) = R(:,:,i-1)'*(dw(:,i-1)+ddq(i-1)*[0 0 1]'+cross(dq(i-1)*wa(:,i-1),[0 0 1]'));
+   a(:,i) = R(:,:,i-1)'*a(:,i-1)+cross(dw(:,i),p(:,i-1))+cross(w(:,i),cross(wa(:,i),p(:,i-1)));
+   ac(:,i) = a(:,i)+cross(dw(:,i),pc(:,i-1))+cross(w(:,i),cross(wa(:,i),pc(:,i-1)));
 end
 
 w = w(:,2:n+1);
+wa = wa(:,2:n+1);
 dw = dw(:,2:n+1);
 ac = ac(:,2:n+1);
 R = cat(3,R,eye(3));
@@ -40,7 +43,7 @@ R = cat(3,R,eye(3));
 % backward recursion
 for i = n:-1:1
     f(:,i) = R(:,:,i+1)*f(:,i+1)+m(i)*ac(:,i);
-    t(:,i) = R(:,:,i+1)*t(:,i+1)+cross(R(:,:,i+1)*f(:,i+1),pc(:,i))-cross(f(:,i),p(:,i)+pc(:,i))+I(:,:,i)*dw(:,i)+cross(w(:,i),I(:,:,i)*w(:,i));
+    t(:,i) = R(:,:,i+1)*t(:,i+1)+cross(R(:,:,i+1)*f(:,i+1),pc(:,i))-cross(f(:,i),p(:,i)+pc(:,i))+I(:,:,i)*dw(:,i)+cross(w(:,i),I(:,:,i)*wa(:,i));
     % assuming all revolute joints
     u(i) = t(:,i)'*(R(:,:,i)'*[0 0 1]');
 end
