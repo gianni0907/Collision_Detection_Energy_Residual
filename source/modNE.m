@@ -1,4 +1,4 @@
-function u = modNE(dq,v,ddq,m,I,R,p,pc,g0)
+function u = modNE(dq,v,ddq,m,I,A,pc,g0)
 % Implementation of Modified Newton-Euler algorithm
 if ~exist('g0','var')
      % no gravity acceleration parameter, default it to 0
@@ -6,16 +6,17 @@ if ~exist('g0','var')
 end
 
 n = size(dq,1);
-
 % check dimension consistency
 if ~(size(v,1)==n && size(ddq,1)==n && size(dq,2)==1 && ...
      size(v,2)==1 && size(ddq,2)==1 && size(m,1)==n && ...
-     size(I,3)==n && size(R,3)==n && size(p,2)==n && size(pc,2)==n) 
+     size(I,3)==n && size(A,3)==n && size(pc,2)==n) 
     disp("Inconsistent input arguments dimension")
     return
 end
 
 % initialization
+R = A(1:3,1:3,:);
+p = [R(:,:,1)'*A(1:3,4,1) R(:,:,2)'*A(1:3,4,2) R(:,:,3)'*A(1:3,4,3)];
 w = zeros(3,n+1);
 wa = zeros(3,n+1);
 dw = zeros(3,n+1);
