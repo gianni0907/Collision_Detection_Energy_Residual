@@ -3,8 +3,10 @@ close all
 clc
 %% Numerical values
 
-Kp = 50; %PD gains
-Kd = 10; 
+Kp = 100; % PD gains
+Kd = 50; 
+
+Ko=0.1; % time constant for the residual
 
 L1=0.5; % link lengths [m]  
 L2=0.5;
@@ -61,29 +63,43 @@ DHTABLE(:,end)=q0;
 out=sim('simulation',[0 10]);
 %% plot the simulation data
 figure
-subplot(311), 
-plot(out.tout,squeeze(out.state(1,1,:))), hold on, grid on
-plot(out.tout,squeeze(out.state(2,1,:)))
-plot(out.tout,squeeze(out.state(3,1,:)))
-legend("$q_1$","$q_2$","$q_3$","Interpreter","latex")
+subplot(211), 
+plot(out.tout,squeeze(out.state(1,1,:)),'r--'), hold on, grid on
+plot(out.tout,squeeze(out.state(2,1,:)),'g--')
+plot(out.tout,squeeze(out.state(3,1,:)),'b--')
+plot(out.tout,squeeze(out.qdesired(1,1,:)),'r')
+plot(out.tout,squeeze(out.qdesired(2,1,:)),'g')
+plot(out.tout,squeeze(out.qdesired(3,1,:)),'b')
+
+legend("$q_1$","$q_2$","$q_3$","$q_{1,d}$","$q_{2,d}$","$q_{3,d}$","Interpreter","latex")
 xlabel("[s]"), ylabel("[rad]")
 title("Joint position")
 
-subplot(312), 
-plot(out.tout,squeeze(out.state(4,1,:))), hold on, grid on
-plot(out.tout,squeeze(out.state(5,1,:)))
-plot(out.tout,squeeze(out.state(6,1,:)))
-legend("$\dot{q}_1$","$\dot{q}_2$","$\dot{q}_3$","Interpreter","latex")
+subplot(212), 
+plot(out.tout,squeeze(out.state(4,1,:)),'r--'), hold on, grid on
+plot(out.tout,squeeze(out.state(5,1,:)),'g--')
+plot(out.tout,squeeze(out.state(6,1,:)),'b--')
+plot(out.tout,squeeze(out.dqdesired(1,1,:)),'r')
+plot(out.tout,squeeze(out.dqdesired(2,1,:)),'g')
+plot(out.tout,squeeze(out.dqdesired(3,1,:)),'b')
+
+legend("$\dot{q}_1$","$\dot{q}_2$","$\dot{q}_3$", ...
+    "$\dot{q}_{1,d}$","$\dot{q}_{2,d}$","$\dot{q}_{3,d}$","Interpreter","latex")
+
 xlabel("[s]"), ylabel("[rad/s]")
 title("Joint velocity")
 
-subplot(313), 
+figure
+subplot(211)
 plot(out.tout,squeeze(out.input(1,1,:))), hold on, grid on
 plot(out.tout,squeeze(out.input(2,1,:)))
 plot(out.tout,squeeze(out.input(3,1,:)))
 legend("$\tau_1$","$\tau_2$","$\tau_3$","Interpreter","latex")
 xlabel("[s]"), ylabel("[Nm]")
 title("Input torques")
+subplot(212)
+plot(out.tout,out.residual), grid on
+title("Residual value"), xlabel("[s]"), ylabel("[W]")
 
 %% show the robot
 cnt = size(out.tout,1);
