@@ -1,2 +1,4 @@
 
 *.asv
+source/slprj/*
+*.slxc
