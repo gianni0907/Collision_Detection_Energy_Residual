@@ -1,8 +1,11 @@
-function out = show_robot(configs)
+function out = show_robot(configs,t)
 % show the robot model moving
 % input:
 % - configs: nx3 array where each row is a joint configuration
-out=-1;
+% - t: time vector
+
+t_fixed = 0:0.05:t(end);
+configs = interp1(t,configs,t_fixed);
 
 L1=0.5; % link lengths [m]  
 L2=0.5;
@@ -54,6 +57,7 @@ addCollision(robot.Bodies{3},cylinder3);
 
 config = homeConfiguration(robot);
 figure
+rate = rateControl(1/0.05);
 for i = 1:size(configs,1)
     config(1).JointPosition = configs(i,1);
     config(2).JointPosition = configs(i,2);
@@ -67,6 +71,7 @@ for i = 1:size(configs,1)
     show(robot, config, 'PreservePlot', false, 'FastUpdate', 1,'Collisions','on');
     hold on
     drawnow
+    waitfor(rate);
 end
 out=1;
 end

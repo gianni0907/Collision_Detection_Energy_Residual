@@ -3,8 +3,8 @@ close all
 clc
 %% Numerical values
 
-Kp = 100; % PD gains
-Kd = 50; 
+Kp = 50; % PD gains
+Kd = 10; 
 
 Ko=0.1; % time constant for the residual
 
@@ -107,4 +107,4 @@ configs=zeros(cnt,3);
 for i=1:cnt
     configs(i,:)=out.state(1:3,1,i);
 end
-show_robot(configs);
+show_robot(configs,out.tout);
