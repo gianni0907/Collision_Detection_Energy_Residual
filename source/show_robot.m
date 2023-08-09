@@ -1,6 +1,8 @@
-close all
-clear variables
-clc
+function out = show_robot(configs)
+% show the robot model moving
+% input:
+% - configs: nx3 array where each row is a joint configuration
+out=-1;
 
 L1=0.5; % link lengths [m]  
 L2=0.5;
@@ -34,8 +36,6 @@ body3.Joint = jnt3;
 addBody(robot,body2,'body1');
 addBody(robot,body3,'body2');
 
-showdetails(robot)
-
 mat1 = [elem_rot_mat('x',pi/2) [0 -L1/2 0]';
         zeros(1,3)             1];
 mat2 = [elem_rot_mat('y',pi/2)  [-L2/2 0 0]';
@@ -51,23 +51,22 @@ cylinder3.Pose = mat3;
 addCollision(robot.Bodies{1},cylinder1);
 addCollision(robot.Bodies{2},cylinder2);
 addCollision(robot.Bodies{3},cylinder3);
-show(robot,'Collisions','on');
-%% animate
-framesPerSecond = 15;
-r = rateControl(framesPerSecond);
+
 config = homeConfiguration(robot);
+figure
+for i = 1:size(configs,1)
+    config(1).JointPosition = configs(i,1);
+    config(2).JointPosition = configs(i,2);
+    config(3).JointPosition = configs(i,3);
 
-for i = 1:50
-    config(1).JointPosition = config(1).JointPosition + 0.02;
-    config(2).JointPosition = config(2).JointPosition + 0.02;
+    % On the left subplot, preserve all previous drawings.
+    % On the right subplot, only keep the most recent drawing.
+    % show(robot, config, 'PreservePlot', false, 'Parent', subplot(1,2,1),'Collisions','on');
+    % show(robot, config, 'Parent', subplot(1,2,2),'Collisions','off');
 
-    % On the left subplot, preserve all previous
-    % drawings, on the right subplot, only keep the
-    % most recent drawing. Note the 'Parent' parameter
-    % selects in which axis the robot is drawn
-    show(robot, config, 'PreservePlot', false, 'Parent', subplot(1,2,1));
-    show(robot, config, 'Parent', subplot(1,2,2));
+    show(robot, config, 'PreservePlot', false, 'FastUpdate', 1,'Collisions','on');
     hold on
     drawnow
-    waitfor(r);
+end
+out=1;
 end
