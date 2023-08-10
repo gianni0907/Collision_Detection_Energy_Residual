@@ -3,10 +3,10 @@ close all
 clc
 %% Numerical values
 
-Kp = 50; % PD gains
-Kd = 10; 
+Kp = 100; % PD gains
+Kd = 50; 
 
-Ko=0.1; % time constant for the residual
+Ko=0.01; % time constant for the residual
 
 L1=0.5; % link lengths [m]  
 L2=0.5;
@@ -39,8 +39,8 @@ DHTABLE = [ pi/2   0     L1     0;
              0     L2    0      0;
              0     L3    0      0];
 %% build structures for NE
-q0 = [0,pi/4,pi/4]';
-dq0 = [0,1,1]';
+q0 = [0,0,0]';
+dq0 = [0,0,0]';
 ddq0 = [0,0,0]';
 m=[m1 m2 m3]';
 rc = zeros(3,1,3);
