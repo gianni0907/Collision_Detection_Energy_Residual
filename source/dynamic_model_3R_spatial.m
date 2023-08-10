@@ -184,5 +184,7 @@ a8=m3*dc3*g0;
 M=eval(M);
 C=eval(C);
 G=eval(G);
+dM=simplify(diff(M,q1)*dq1+diff(M,q2)*dq2+diff(M,q3)*dq3);
 %% create function that returns [M,C,g]
-matlabFunction(M,C,G,'File','get_dyn_terms.m','Vars',[q2 q3 dq1 dq2 dq3]);
+% matlabFunction(M,C,G,'File','get_dyn_terms.m','Vars',[q2 q3 dq1 dq2 dq3]);
+% matlabFunction(dM,'File','get_dM.m','Vars',[q2 q3 dq2 dq3]);

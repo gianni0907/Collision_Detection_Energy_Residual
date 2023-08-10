@@ -72,7 +72,7 @@ M(:,2) = newton_euler(zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1), ..
 M(:,3) = newton_euler(zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1), ...
         Ai,zeros(3,1),[0;0;1],m,I,rc);
 K_init = 0.5*dq0'*M*dq0;
-% Ai=DHMatrix(DHTABLE);
+
 % S=zeros(3,3);
 % S(:,1)=0.5*(newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0+[1;0;0],ddq0,m,I,rc)- ...
 %             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0,ddq0,m,I,rc)- ...
@@ -83,7 +83,22 @@ K_init = 0.5*dq0'*M*dq0;
 % S(:,3)=0.5*(newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0+[0;0;1],ddq0,m,I,rc)- ...
 %             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0,ddq0,m,I,rc)- ...
 %             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,[0;0;1],ddq0,m,I,rc));
+% S
 % [~,C,~] = get_dyn_terms(q0(2),q0(3),dq0(1),dq0(2),dq0(3));
+% C
+% Sm=zeros(3,3);
+% Sm(:,1)=mod_newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0,[1;0;0],ddq0,m,I,rc);
+% Sm(:,2)=mod_newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0,[0;1;0],ddq0,m,I,rc);
+% Sm(:,3)=mod_newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0,[0;0;1],ddq0,m,I,rc);
+% Sm
+% Mdot=get_dM(q0(2),q0(3),dq0(2),dq0(3));
+% disp('*******')
+% disp(C+C'-Mdot)
+% disp('*******')
+% disp(S+S'-Mdot)
+% disp('*******')
+% disp(Sm+Sm'-Mdot)
+
 out=sim('simulation',[0 10]);
 %% plot the simulation data
 figure
