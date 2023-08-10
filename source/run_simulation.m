@@ -3,9 +3,18 @@ close all
 clc
 %% Numerical values
 
+% initial conditions
+q0 = [0,0,0]';
+dq0 = [0,0,0]';
+ddq0 = [0,0,0]';
+
+% Controller Parameters
 Kp = 100; % PD gains
 Kd = 50; 
-
+% parameters for the polynomial trajectory
+Waypoints = [q0(1) pi/2 pi; q0(2) pi/4 pi/2; q0(3) pi/2 0];
+Velocities = [dq0(1) zeros(1,2);dq0(2) zeros(1,2);dq0(3) zeros(1,2)];
+Timepoints = [0 5 10];
 Ko=0.01; % time constant for the residual
 
 L1=0.5; % link lengths [m]  
@@ -39,9 +48,7 @@ DHTABLE = [ pi/2   0     L1     0;
              0     L2    0      0;
              0     L3    0      0];
 %% build structures for NE
-q0 = [0,0,0]';
-dq0 = [0,0,0]';
-ddq0 = [0,0,0]';
+
 m=[m1 m2 m3]';
 rc = zeros(3,1,3);
 rc(:,:,1)=[0, -L1+dc1, 0]';
@@ -49,7 +56,7 @@ rc(:,:,2)=[-L2+dc2, 0, 0]';
 rc(:,:,3)=[-L3+dc3, 0, 0]';
 
 I = zeros(3,3,3);
-I(:,:,1)=diag([0 0 I1zz]);
+I(:,:,1)=diag([0 I1zz 0]);
 I(:,:,2)=diag([I2xx I2yy I2zz]);
 I(:,:,3)=diag([I3xx I3yy I3zz]);
 
@@ -107,21 +114,40 @@ xlabel("[s]"), ylabel("[rad/s]")
 title("Joint velocity")
 
 figure
-subplot(211)
+subplot(311)
 plot(out.tout,squeeze(out.input(1,1,:))), hold on, grid on
 plot(out.tout,squeeze(out.input(2,1,:)))
 plot(out.tout,squeeze(out.input(3,1,:)))
 legend("$\tau_1$","$\tau_2$","$\tau_3$","Interpreter","latex")
 xlabel("[s]"), ylabel("[Nm]")
 title("Input torques")
-subplot(212)
+subplot(312)
+plot(out.tout,squeeze(out.f_ext(1,1,:))), hold on, grid on
+plot(out.tout,squeeze(out.f_ext(2,1,:)))
+plot(out.tout,squeeze(out.f_ext(3,1,:)))
+legend("$f_{ext,x}$","$f_{ext,y}$","$f_{ext,z}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[N]")
+title("External force")
+subplot(313)
+plot(out.tout,squeeze(out.tau_ext(1,1,:))), hold on, grid on
+plot(out.tout,squeeze(out.tau_ext(2,1,:)))
+plot(out.tout,squeeze(out.tau_ext(3,1,:)))
+legend("$\tau_{ext,1}$","$\tau_{ext,2}$","$\tau_{ext,3}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[N]")
+title("Resulting joint torque")
+
+figure
+subplot(211)
 plot(out.tout,out.residual), grid on
 title("Residual value"), xlabel("[s]"), ylabel("[W]")
+subplot(212)
+plot(out.tout,squeeze(out.p_ext)), grid on
+title("External power"), xlabel("[s]"), ylabel("[W]")
 
 %% show the robot
-cnt = size(out.tout,1);
-configs=zeros(cnt,3);
-for i=1:cnt
-    configs(i,:)=out.state(1:3,1,i);
-end
-show_robot(configs,out.tout);
+% cnt = size(out.tout,1);
+% configs=zeros(cnt,3);
+% for i=1:cnt
+%     configs(i,:)=out.state(1:3,1,i);
+% end
+% show_robot(configs,out.tout);
