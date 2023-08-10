@@ -2,7 +2,7 @@ clear variables
 close all
 clc
 
-% Numerical definition of dynamic parameters
+%% Numerical definition of dynamic parameters
 g0=9.81; % acceleration of gravity [m/s^2]
 N=3;  % number of joints
 l = [0.5 0.5 0.4]'; % link lengths [m]
@@ -21,14 +21,19 @@ pc = [0             -l(2)+dc(2) -l(3)+dc(3);
       -l(1)+dc(1)   0           0;
       0             0           0];
 
-q = [0 pi/4 pi/4]';
-dq = [0  1 1]';
-ddq = [0 0 0]';
+DHTABLE = [ pi/2      0         l(1)     0;
+             0        l(2)        0      0;
+             0        l(3)        0      0];
 
-DHTABLE = [ pi/2      0         l(1)     q(1);
-             0        l(2)        0      q(2);
-             0        l(3)        0      q(3)];
+% initialization of the state vector
+q0 = [0 0 0]';
+dq0 = [0 0 0]';
+x0 = [q0' dq0']';
 
-[T,A] = DHMatrix(DHTABLE);
-
+% define joint space waypoints of the trajectory
+wp = [q0(1), pi/8, pi/6, pi/4, pi/3;
+      q0(2), pi/9, pi/8, pi/7, pi/4;
+      q0(3), pi/9, pi/8, pi/7, pi/3];
+%% instantiate the model and define Input/Output parameters
 out=sim('simulation.slx');
+
