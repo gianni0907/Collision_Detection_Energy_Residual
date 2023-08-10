@@ -39,8 +39,8 @@ DHTABLE = [ pi/2   0     L1     0;
              0     L2    0      0;
              0     L3    0      0];
 %% build structures for NE
-q0 = [0,0,0]';
-dq0 = [0,0,0]';
+q0 = [0,pi/4,pi/4]';
+dq0 = [0,1,1]';
 ddq0 = [0,0,0]';
 m=[m1 m2 m3]';
 rc = zeros(3,1,3);
@@ -54,12 +54,29 @@ I(:,:,2)=diag([I2xx I2yy I2zz]);
 I(:,:,3)=diag([I3xx I3yy I3zz]);
 
 DHTABLE(:,end)=q0;
-%Ai=DHMatrix(DHTABLE);
-% temp=newton_euler([0;0;0],[0;0;0],[0;0;g0],[0;0;0],[0;0;0],...
-% Ai,[0;0;0],[0;0;0],m,I,rc);
-% temp2=newton_euler2([0;0;0],[0;0;0],[0;0;g0],[0;0;0],[0;0;0],...
-% Ai,[0;0;0],[0;0;0],m,I,rc);
 
+% compute initial kinetic energy to initialize the residual
+Ai = DHMatrix(DHTABLE);
+M = zeros(3,3);
+M(:,1) = newton_euler(zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1), ...
+        Ai,zeros(3,1),[1;0;0],m,I,rc);
+M(:,2) = newton_euler(zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1), ...
+        Ai,zeros(3,1),[0;1;0],m,I,rc);
+M(:,3) = newton_euler(zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1),zeros(3,1), ...
+        Ai,zeros(3,1),[0;0;1],m,I,rc);
+K_init = 0.5*dq0'*M*dq0;
+% Ai=DHMatrix(DHTABLE);
+% S=zeros(3,3);
+% S(:,1)=0.5*(newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0+[1;0;0],ddq0,m,I,rc)- ...
+%             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0,ddq0,m,I,rc)- ...
+%             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,[1;0;0],ddq0,m,I,rc));
+% S(:,2)=0.5*(newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0+[0;1;0],ddq0,m,I,rc)- ...
+%             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0,ddq0,m,I,rc)- ...
+%             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,[0;1;0],ddq0,m,I,rc));
+% S(:,3)=0.5*(newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0+[0;0;1],ddq0,m,I,rc)- ...
+%             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,dq0,ddq0,m,I,rc)- ...
+%             newton_euler([0;0;0],[0;0;0],[0;0;0],[0;0;0],[0;0;0],Ai,[0;0;1],ddq0,m,I,rc));
+% [~,C,~] = get_dyn_terms(q0(2),q0(3),dq0(1),dq0(2),dq0(3));
 out=sim('simulation',[0 10]);
 %% plot the simulation data
 figure

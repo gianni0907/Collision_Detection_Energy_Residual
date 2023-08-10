@@ -70,7 +70,7 @@ for i = 1:size(configs,1)
 
     show(robot, config, 'PreservePlot', false, 'FastUpdate', 1,'Collisions','on');
     hold on
-    title("$t="+rate.TotalElapsedTime+"s$","Interpreter","latex")
+    title("$t="+compose("%.2f",t_fixed(i))+"s$","Interpreter","latex")
     drawnow
     waitfor(rate);
 end
