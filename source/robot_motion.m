@@ -1,17 +1,6 @@
-close all
-clear variables
-clc
-
-L1=0.5; % link lengths [m]  
-L2=0.5;
-L3=0.4;
-r1=0.2; 
-r2=0.1;
-r3=0.1; 
-dhparams = [0   	pi/2	L1   	0;
-            L2      0       0       0;
-            L3      0       0   	0];
-
+function robot_motion(DHTable,l,r,q)
+%showing the motion of the robot
+dhparams = [DHTable(:,2) DHTable(:,1) DHTable(:,3:4)];
 robot = rigidBodyTree;
 body1 = rigidBody('body1');
 jnt1 = rigidBodyJoint('jnt1','revolute');
@@ -33,41 +22,38 @@ body3.Joint = jnt3;
 
 addBody(robot,body2,'body1');
 addBody(robot,body3,'body2');
-
-showdetails(robot)
-
-mat1 = [elem_rot_mat('x',pi/2) [0 -L1/2 0]';
+mat1 = [elem_rot_mat('x',pi/2) [0 -l(1)/2 0]';
         zeros(1,3)              1];
-mat2 = [elem_rot_mat('y',pi/2)  [-L2/2 0 0]';
+mat2 = [elem_rot_mat('y',pi/2)  [-l(2)/2 0 0]';
         zeros(1,3)               1];
-mat3 = [elem_rot_mat('y',pi/2)  [-L3/2 0 0]';
+mat3 = [elem_rot_mat('y',pi/2)  [-l(3)/2 0 0]';
         zeros(1,3)               1];
-cylinder1 = collisionCylinder(r1,L1);
-cylinder2 = collisionCylinder(r2,L2);
-cylinder3 = collisionCylinder(r3,L3);
+cylinder1 = collisionCylinder(r(1),l(1));
+cylinder2 = collisionCylinder(r(2),l(2));
+cylinder3 = collisionCylinder(r(3),l(3));
 cylinder1.Pose = mat1;
 cylinder2.Pose = mat2;
 cylinder3.Pose = mat3;
 addCollision(robot.Bodies{1},cylinder1);
 addCollision(robot.Bodies{2},cylinder2);
 addCollision(robot.Bodies{3},cylinder3);
-show(robot,'Collisions','on');
+% show(robot,'Collisions','off');
 %% animate
 framesPerSecond = 15;
 r = rateControl(framesPerSecond);
 config = homeConfiguration(robot);
 
-for i = 1:50
-    config(1).JointPosition = config(1).JointPosition + 0.02;
-    config(2).JointPosition = config(2).JointPosition + 0.02;
-
-    % On the left subplot, preserve all previous
-    % drawings, on the right subplot, only keep the
+for i = 1:size(q,1)
+    config(1).JointPosition = q(i,1);
+    config(2).JointPosition = q(i,2);
+    config(3).JointPosition = q(i,3);
+    % On the right subplot, preserve all previous
+    % drawings, on the left subplot, only keep the
     % most recent drawing. Note the 'Parent' parameter
     % selects in which axis the robot is drawn
-    show(robot, config, 'PreservePlot', false, 'Parent', subplot(1,2,1));
-    show(robot, config, 'Parent', subplot(1,2,2));
+    show(robot, config, 'PreservePlot', false, 'FastUpdate', 1,'Collisions','on');
     hold on
     drawnow
     waitfor(r);
+end
 end
