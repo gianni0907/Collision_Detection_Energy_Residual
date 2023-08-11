@@ -31,7 +31,10 @@ DHTABLE = [ pi/2      0         l(1)     0;
 q0 = [0 0 0]';
 dq0 = [0 0 0]';
 x0 = [q0' dq0']';
-DHTABLE = DHTABLE+[zeros(3,3) q0]
+DHTABLE = DHTABLE+[zeros(3,3) q0];
+[~,A0] = DHMatrix(DHTABLE);
+M0 = [modNE([0;0;0],[0;0;0],[1;0;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;1;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;0;1],m,I,A0,pc,0)];
+T0 = 0.5*dq0'*M0*dq0;
 % define joint space waypoints of the trajectory, associated instant of
 % time and velocity boundary conditions
 wp = [q0(1), pi/2, pi;
@@ -40,11 +43,12 @@ wp = [q0(1), pi/2, pi;
 tp = [0 5 10];
 boundary_vel = zeros(3,3);
 
-% set gain values for pd feedback
-Kp = 100;
-Kd = 50;
-
-%% run the simulation and show the results 
+% set gain values for pd feedback and residual gain
+Kp = 1e2;
+Kd = 5e1;
+Ko = 1e2;
+%% run the simulation and show the results
+DHTABLE(:,4) = zeros(3,1);
 out=sim('simulation.slx');
 q_des = reshape(out.x_des(1:3,:,:),N,size(out.x_des,3))';
 dq_des = reshape(out.x_des(4:6,:,:),N,size(out.x_des,3))';

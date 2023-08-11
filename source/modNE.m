@@ -7,6 +7,7 @@ if ~(size(v,1)==n && size(ddq,1)==n && size(dq,2)==1 && ...
      size(v,2)==1 && size(ddq,2)==1 && size(m,1)==n && ...
      size(I,3)==n && size(A,3)==n && size(pc,2)==n) 
     disp("Inconsistent input arguments dimension")
+    u = zeros(n,1);
     return
 end
 
