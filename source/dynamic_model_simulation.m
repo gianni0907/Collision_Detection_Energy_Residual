@@ -55,6 +55,7 @@ dq_des = reshape(out.x_des(4:6,:,:),N,size(out.x_des,3))';
 q_act = reshape(out.x(1:3,:,:),N,size(out.x,3))';
 dq_act = reshape(out.x(4:6,:,:),N,size(out.x,3))';
 u = reshape(out.u,N,size(out.u,3))';
-plot_data(q_des,dq_des,q_act,dq_act,u,out.tout);
-robot_motion(DHTABLE,l,r,q_act);
-
+r = out.r;
+T = reshape(out.T,size(out.T,3),1);
+plot_data(q_des,dq_des,q_act,dq_act,u,r,T,out.tout);
+% robot_motion(DHTABLE,l,r,q_act);
