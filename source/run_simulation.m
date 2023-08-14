@@ -6,6 +6,7 @@ clc
 % initial conditions
 q0 = [0,0,0]';
 dq0 = [0,0,0]';
+x0=[q0;dq0];
 ddq0 = [0,0,0]';
 
 % Controller Parameters
@@ -15,7 +16,7 @@ Kd = 50;
 Waypoints = [q0(1) pi/2 pi; q0(2) pi/4 pi/2; q0(3) pi/2 0];
 Velocities = [dq0(1) zeros(1,2);dq0(2) zeros(1,2);dq0(3) zeros(1,2)];
 Timepoints = [0 5 10];
-Ko=0.01; % time constant for the residual
+Ko=10; % time constant for the residual
 
 L1=0.5; % link lengths [m]  
 L2=0.5;
@@ -156,7 +157,7 @@ subplot(211)
 plot(out.tout,out.residual), grid on
 title("Residual value"), xlabel("[s]"), ylabel("[W]")
 subplot(212)
-plot(out.tout,squeeze(out.p_ext)), grid on
+plot(out.tout,out.p_ext), grid on
 title("External power"), xlabel("[s]"), ylabel("[W]")
 
 %% show the robot
