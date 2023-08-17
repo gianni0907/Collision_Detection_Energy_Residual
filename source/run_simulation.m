@@ -5,7 +5,7 @@ clc
 
 % initial conditions
 q0 = [0,0,0]';
-dq0 = [0,0,0]';
+dq0 = [0.5,0.5,0.5]';
 x0=[q0;dq0];
 ddq0 = [0,0,0]';
 
@@ -14,7 +14,7 @@ Kp = 100; % PD gains
 Kd = 50; 
 % parameters for the polynomial trajectory
 Waypoints = [q0(1) pi/2 pi; q0(2) pi/4 pi/2; q0(3) pi/2 0];
-Velocities = [dq0(1) zeros(1,2);dq0(2) zeros(1,2);dq0(3) zeros(1,2)];
+Velocities = [dq0(1) 0 0;dq0(2) 0 0;dq0(3) zeros(1,2)];
 Timepoints = [0 5 10];
 Ko=10; % time constant for the residual
 
@@ -48,6 +48,12 @@ g0=9.81; % acceleration of gravity [m/s^2]
 DHTABLE = [ pi/2   0     L1     0;
              0     L2    0      0;
              0     L3    0      0];
+%% Pick gain for the observer
+lambda_1 = 0.094789482226257512094598012320061/2;
+c0_bar = 1.962390280742725;
+vmax=2;
+eta=1;
+K0=c0_bar*(vmax+eta)/(2*lambda_1);
 %% build structures for NE
 
 m=[m1 m2 m3]';
@@ -102,32 +108,70 @@ K_init = 0.5*dq0'*M*dq0;
 
 out=sim('simulation',[0 10]);
 %% plot the simulation data
-figure
-subplot(211), 
-plot(out.tout,squeeze(out.state(1,1,:)),'r--'), hold on, grid on
-plot(out.tout,squeeze(out.state(2,1,:)),'g--')
-plot(out.tout,squeeze(out.state(3,1,:)),'b--')
-plot(out.tout,squeeze(out.qdesired(1,1,:)),'r')
-plot(out.tout,squeeze(out.qdesired(2,1,:)),'g')
-plot(out.tout,squeeze(out.qdesired(3,1,:)),'b')
-
-legend("$q_1$","$q_2$","$q_3$","$q_{1,d}$","$q_{2,d}$","$q_{3,d}$","Interpreter","latex")
+f=figure;
+f.Position=[276.2,77,988.8,658.4];
+subplot(321), 
+plot(out.tout,squeeze(out.state(1,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.qdesired(1,1,:)))
+legend("$q_1$","$q_{1,d}$","Interpreter","latex")
 xlabel("[s]"), ylabel("[rad]")
-title("Joint position")
+title("Desired vs actual joint position")
 
-subplot(212), 
-plot(out.tout,squeeze(out.state(4,1,:)),'r--'), hold on, grid on
-plot(out.tout,squeeze(out.state(5,1,:)),'g--')
-plot(out.tout,squeeze(out.state(6,1,:)),'b--')
-plot(out.tout,squeeze(out.dqdesired(1,1,:)),'r')
-plot(out.tout,squeeze(out.dqdesired(2,1,:)),'g')
-plot(out.tout,squeeze(out.dqdesired(3,1,:)),'b')
+subplot(323), 
+plot(out.tout,squeeze(out.state(2,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.qdesired(2,1,:)))
+legend("$q_2$","$q_{2,d}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad]")
 
-legend("$\dot{q}_1$","$\dot{q}_2$","$\dot{q}_3$", ...
-    "$\dot{q}_{1,d}$","$\dot{q}_{2,d}$","$\dot{q}_{3,d}$","Interpreter","latex")
+subplot(325), 
+plot(out.tout,squeeze(out.state(2,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.qdesired(2,1,:)))
+legend("$q_3$","$q_{3,d}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad]")
 
+subplot(322), 
+plot(out.tout,squeeze(out.state(4,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.dqdesired(1,1,:)))
+legend("$\dot{q}_1$","$\dot{q}_{1,d}$","Interpreter","latex")
 xlabel("[s]"), ylabel("[rad/s]")
-title("Joint velocity")
+title("Desired vs actual joint velocity")
+
+subplot(324), 
+plot(out.tout,squeeze(out.state(5,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.dqdesired(2,1,:)))
+legend("$\dot{q}_1$","$\dot{q}_{1,d}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad/s]")
+
+subplot(326), 
+plot(out.tout,squeeze(out.state(6,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.dqdesired(3,1,:)))
+legend("$\dot{q}_1$","$\dot{q}_{1,d}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad/s]")
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+f=figure;
+f.Position=[276.2,77,988.8,658.4];
+subplot(311), 
+plot(out.tout,squeeze(out.state(4,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.dq_est(1,1,:)))
+legend("$\dot{q}_1$","$\dot{q}_{1,est}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad/s]")
+title("actual vs estimated joint velocity")
+
+subplot(312), 
+plot(out.tout,squeeze(out.state(5,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.dq_est(2,1,:)))
+legend("$\dot{q}_2$","$\dot{q}_{2,est}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad/s]")
+
+subplot(313), 
+plot(out.tout,squeeze(out.state(6,1,:)),'--'), hold on, grid on
+plot(out.tout,squeeze(out.dq_est(3,1,:)))
+legend("$\dot{q}_3$","$\dot{q}_{3,est}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad/s]")
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure
 subplot(311)
@@ -152,6 +196,8 @@ legend("$\tau_{ext,1}$","$\tau_{ext,2}$","$\tau_{ext,3}$","Interpreter","latex")
 xlabel("[s]"), ylabel("[N]")
 title("Resulting joint torque")
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 figure
 subplot(211)
 plot(out.tout,out.residual), grid on
@@ -161,9 +207,9 @@ plot(out.tout,out.p_ext), grid on
 title("External power"), xlabel("[s]"), ylabel("[W]")
 
 %% show the robot
-% cnt = size(out.tout,1);
-% configs=zeros(cnt,3);
-% for i=1:cnt
-%     configs(i,:)=out.state(1:3,1,i);
-% end
-% show_robot(configs,out.tout);
+cnt = size(out.tout,1);
+configs=zeros(cnt,3);
+for i=1:cnt
+    configs(i,:)=out.state(1:3,1,i);
+end
+show_robot(configs,out.tout);

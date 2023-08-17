@@ -129,7 +129,6 @@ c2=dq'*C2*dq;
 c3=dq'*C3*dq;
 c=[c1;c2;c3];
 
-dM=diff(M,q1)*dq1+diff(M,q2)*dq2+diff(M,q3)*dq3;
 C=[dq'*C1;dq'*C2;dq'*C3];
 
 g=[0;0;-g0];  % gravity acceleration along -z0
@@ -188,3 +187,15 @@ dM=simplify(diff(M,q1)*dq1+diff(M,q2)*dq2+diff(M,q3)*dq3);
 %% create function that returns [M,C,g]
 % matlabFunction(M,C,G,'File','get_dyn_terms.m','Vars',[q2 q3 dq1 dq2 dq3]);
 % matlabFunction(dM,'File','get_dM.m','Vars',[q2 q3 dq2 dq3]);
+%% study eigenvalues of M
+lambda=eig(M);
+q2span = 0:0.1:2*pi;
+q3span = 0:0.1:2*pi;
+figure
+plot(q3span,subs(lambda(1),q3,q3span)),hold on,
+plot(q3span,subs(lambda(2),q3,q3span)),legend("first","second")
+min_first=min(subs(lambda(1),q3,q3span));
+figure
+f = @(x,y) cos(2*x + y)/2 + cos(y)/2 + (61*cos(x + y)^2)/240 + (247*cos(x)^2)/120 + 3/8;
+fs=fsurf(f,[0 2*pi 0 2*pi]);
+min_third=min(fs.ZData);
