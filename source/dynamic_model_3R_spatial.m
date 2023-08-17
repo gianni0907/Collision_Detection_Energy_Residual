@@ -195,7 +195,10 @@ figure
 plot(q3span,subs(lambda(1),q3,q3span)),hold on,
 plot(q3span,subs(lambda(2),q3,q3span)),legend("first","second")
 min_first=min(subs(lambda(1),q3,q3span));
+max_second=max(subs(lambda(2),q3,q3span));
+
 figure
 f = @(x,y) cos(2*x + y)/2 + cos(y)/2 + (61*cos(x + y)^2)/240 + (247*cos(x)^2)/120 + 3/8;
 fs=fsurf(f,[0 2*pi 0 2*pi]);
 min_third=min(fs.ZData);
+max_third=max(fs.ZData);

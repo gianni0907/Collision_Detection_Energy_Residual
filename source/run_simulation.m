@@ -49,11 +49,13 @@ DHTABLE = [ pi/2   0     L1     0;
              0     L2    0      0;
              0     L3    0      0];
 %% Pick gain for the observer
-lambda_1 = 0.094789482226257512094598012320061/2;
+lambda_1 = 0.094789482226257512094598012320061 / 2;
+lambda_2 = 3.6875 / 2;
 c0_bar = 1.962390280742725;
 vmax=2;
 eta=1;
 K0=c0_bar*(vmax+eta)/(2*lambda_1);
+z0=-K0*q0;
 %% build structures for NE
 
 m=[m1 m2 m3]';
@@ -154,21 +156,44 @@ f=figure;
 f.Position=[276.2,77,988.8,658.4];
 subplot(311), 
 plot(out.tout,squeeze(out.state(4,1,:)),'--'), hold on, grid on
-plot(out.tout,squeeze(out.dq_est(1,1,:)))
-legend("$\dot{q}_1$","$\dot{q}_{1,est}$","Interpreter","latex")
+plot(out.tout,squeeze(out.dqdesired(1,1,:)),'.-b')
+plot(out.tout,squeeze(out.dq_est(1,1,:)),'r')
+legend("$\dot{q}_1$","$\dot{q}_{1,d}$","$\dot{q}_{1,est}$","Interpreter","latex")
 xlabel("[s]"), ylabel("[rad/s]")
-title("actual vs estimated joint velocity")
+title("actual vs desired vs estimated joint velocity")
 
 subplot(312), 
 plot(out.tout,squeeze(out.state(5,1,:)),'--'), hold on, grid on
-plot(out.tout,squeeze(out.dq_est(2,1,:)))
-legend("$\dot{q}_2$","$\dot{q}_{2,est}$","Interpreter","latex")
+plot(out.tout,squeeze(out.dqdesired(2,1,:)),'.-b')
+plot(out.tout,squeeze(out.dq_est(2,1,:)),'r')
+legend("$\dot{q}_2$","$\dot{q}_{2,d}$","$\dot{q}_{2,est}$","Interpreter","latex")
 xlabel("[s]"), ylabel("[rad/s]")
 
 subplot(313), 
 plot(out.tout,squeeze(out.state(6,1,:)),'--'), hold on, grid on
-plot(out.tout,squeeze(out.dq_est(3,1,:)))
-legend("$\dot{q}_3$","$\dot{q}_{3,est}$","Interpreter","latex")
+plot(out.tout,squeeze(out.dqdesired(3,1,:)),'.-b')
+plot(out.tout,squeeze(out.dq_est(3,1,:)),'r')
+legend("$\dot{q}_3$","$\dot{q}_{3,d}$","$\dot{q}_{3,est}$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad/s]")
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+f=figure;
+f.Position=[276.2,77,988.8,658.4];
+subplot(311), 
+plot(out.tout,squeeze(out.state(4,1,:)-out.dq_est(1,1,:))),grid on
+legend("$e_1$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad/s]")
+title("error=actual-estimated")
+
+subplot(312), 
+plot(out.tout,squeeze(out.state(5,1,:)-out.dq_est(2,1,:))),grid on
+legend("$e_2$","Interpreter","latex")
+xlabel("[s]"), ylabel("[rad/s]")
+
+subplot(313), 
+plot(out.tout,squeeze(out.state(6,1,:)-out.dq_est(3,1,:))),grid on
+legend("$e_3$","Interpreter","latex")
 xlabel("[s]"), ylabel("[rad/s]")
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -207,9 +232,9 @@ plot(out.tout,out.p_ext), grid on
 title("External power"), xlabel("[s]"), ylabel("[W]")
 
 %% show the robot
-cnt = size(out.tout,1);
-configs=zeros(cnt,3);
-for i=1:cnt
-    configs(i,:)=out.state(1:3,1,i);
-end
-show_robot(configs,out.tout);
+% cnt = size(out.tout,1);
+% configs=zeros(cnt,3);
+% for i=1:cnt
+%     configs(i,:)=out.state(1:3,1,i);
+% end
+% show_robot(configs,out.tout);
