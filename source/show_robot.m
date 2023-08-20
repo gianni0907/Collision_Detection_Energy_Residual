@@ -4,8 +4,8 @@ function out = show_robot(configs,t)
 % - configs: nx3 array where each row is a joint configuration
 % - t: time vector
 
-t_fixed = 0:0.05:t(end);
-configs = interp1(t,configs,t_fixed);
+% t_fixed = 0:0.05:t(end);
+% configs = interp1(t,configs,t_fixed);
 
 L1=0.5; % link lengths [m]  
 L2=0.5;
@@ -56,8 +56,7 @@ addCollision(robot.Bodies{2},cylinder2);
 addCollision(robot.Bodies{3},cylinder3);
 
 config = homeConfiguration(robot);
-figure
-rate = rateControl(1/0.05);
+rate = rateControl(30);
 for i = 1:size(configs,1)
     config(1).JointPosition = configs(i,1);
     config(2).JointPosition = configs(i,2);
@@ -68,9 +67,9 @@ for i = 1:size(configs,1)
     % show(robot, config, 'PreservePlot', false, 'Parent', subplot(1,2,1),'Collisions','on');
     % show(robot, config, 'Parent', subplot(1,2,2),'Collisions','off');
 
-    show(robot, config, 'PreservePlot', false, 'FastUpdate', 1,'Collisions','on');
+    show(robot, config, 'PreservePlot', false, 'FastUpdate', 1,'Collisions','off');
     hold on
-    title("$t="+compose("%.2f",t_fixed(i))+"s$","Interpreter","latex")
+    title("$t="+compose("%.2f",t(i))+"s$","Interpreter","latex")
     drawnow
     waitfor(rate);
 end
