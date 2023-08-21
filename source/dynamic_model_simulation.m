@@ -86,29 +86,37 @@ c = [0.4; 0.2; 0.7];  % center of the circle
 r_c = 0.3;  % circle radius
 T = 4; % period
 t0 = 2; % start of motion time
-% second motion: 
-
+p_init=c;
+p0 = [c(1); c(2)+r_c; c(3)];
+% rest phase: 
+t1 = t0+T;
+T_stop1 = 6;
+t2 = t1+T_stop1;
+% second motion:
+p1 = [0.8; c(2); c(3)];
+T_line1 = 2;
+% rest phase:
+t3 = t2+T_line1;
+T_stop2 = 3;
+t4 = t3+T_stop2;
 % third motion: 
-p_i = [0.8 0.0 0.5];
-p_f = [0.0 0.8 0.5];
-time_int = [7 9];
+p2 = [c(1);c(2)-r_c;c(3)];
+T_line2 = 2.5;
+t5 = t4+T_line2;
+% rest phase
+T_stop3 = 0.5;
 % check whether the points are out of workspace
-c3_i = (p_i(1)^2+p_i(2)^2+(p_i(3)-l(1))^2-l(2)^2-l(3)^2)/(2*l(2)*l(3));
-c3_f = (p_f(1)^2+p_f(2)^2+(p_f(3)-l(1))^2-l(2)^2-l(3)^2)/(2*l(2)*l(3));
-if (c3_i < -1 || c3_i > 1)
-    disp("Initial point out of workspace");
-    return
-end
-if (c3_f < -1 || c3_f > 1)
-    disp("Final point out of workspace");
-    return
+if ~(check_in_workspace(p0,l) && check_in_workspace(p1,l) && ...
+        check_in_workspace(p2,l) && ...
+        check_in_workspace([c(1);c(2);c(3)+r_c],l) && ...
+        check_in_workspace([c(1);c(2);c(3)-r_c],l))
+    return;
 end
 
 % initialization of the state integrator
-% q0 = rand(N,1)*2*pi-pi;
-% dq0 = rand(N,1)*4*vmax-2*vmax;
-q0 = inverse_kinematics(p_i,l,'nn');
-dq0 = [0 0 0]';
+soln_type = 'pn';
+q0 = inverse_kinematics(p_init,l,soln_type);
+dq0 = [0.5 -0.5 1]';
 x0 = [q0; dq0];
 % initialization of the reduced observer integrator
 z0 = -K0*q0;
@@ -121,7 +129,7 @@ T0 = 0.5*dq0'*M0*dq0;
 s0 = ceil(norm(dq0)/vbar);
 
 %% run the simulation and show the results
-out=sim('simulation.slx',[0 20]);
+out=sim('simulation_prev.slx',[0 20]);
 
 t = out.tout';
 u_ext = out.u_ext';
@@ -133,29 +141,34 @@ q = reshape(out.x(1:3,:,:),N,size(out.x,3));
 dq = reshape(out.x(4:6,:,:),N,size(out.x,3));
 u = reshape(out.u,N,size(out.u,3));
 r = out.r';
-% plot_data_fullstate(q_des,dq_des,q,dq,u,u_ext,r,P_ext,t);
-figure();
+plot_data_fullstate(q_des,dq_des,q,dq,u,u_ext,r,P_ext,t);
+figure
 show(robot,homeConfiguration(robot));
 cla
 hold on
-plot3(p_i(1),p_i(2),p_i(3),'.','MarkerSize',18);
-plot3(p_f(1),p_f(2),p_f(3),'.','MarkerSize',18);
-plot3([p_i(1),p_f(1)],[p_i(2),p_f(2)],[p_i(3),p_f(3)],'LineWidth',1.2);
+plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
+t_c=0:0.05:T;
+plot3(c(1)*ones(size(t_c,2),1),c(2)+r_c*cos(2*pi/T*t_c),c(3)+r_c*sin(2*pi/T*t_c),'LineWidth',1.2)
+plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
+plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
+plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
+plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
+
 robot_motion(robot,q,t);
 
 % output from reduced-order observer case
-% q_obs = reshape(out.x_obs(1:3,:,:),N,size(out.x_obs,3));
-% dq_obs = reshape(out.x_obs(4:6,:,:),N,size(out.x_obs,3));
-% u_obs = reshape(out.u_obs,N,size(out.u_obs,3));
-% r_obs = out.r_obs';
-% dq_hat = out.x2hat';
-% s = out.s';
-% plot_data_redobs(q_des,dq_des,q_obs,dq_obs,dq_hat,u_obs,u_ext,r_obs,P_ext,s,vbar,eta,t);
+q_obs = reshape(out.x_obs(1:3,:,:),N,size(out.x_obs,3));
+dq_obs = reshape(out.x_obs(4:6,:,:),N,size(out.x_obs,3));
+u_obs = reshape(out.u_obs,N,size(out.u_obs,3));
+r_obs = out.r_obs';
+dq_hat = out.x2hat';
+s = out.s';
+plot_data_redobs(q_des,dq_des,q_obs,dq_obs,dq_hat,u_obs,u_ext,r_obs,P_ext,s,vbar,eta,t);
 
 % output from finite differentiation velocity estimation
-% q_diff = reshape(out.x_diff(1:3,:,:),N,size(out.x_diff,3));
-% dq_diff = reshape(out.x_diff(4:6,:,:),N,size(out.x_diff,3));
-% dq_est = reshape(out.x_est(4:6,:,:),N,size(out.x_est,3));
-% u_diff = reshape(out.u_diff,N,size(out.u_diff,3));
-% r_diff = out.r_diff';
-% plot_data_findiff(q_des,dq_des,q_diff,dq_diff,dq_est,u_diff,u_ext,r_diff,P_ext,t);
+q_diff = reshape(out.x_diff(1:3,:,:),N,size(out.x_diff,3));
+dq_diff = reshape(out.x_diff(4:6,:,:),N,size(out.x_diff,3));
+dq_est = reshape(out.x_est(4:6,:,:),N,size(out.x_est,3));
+u_diff = reshape(out.u_diff,N,size(out.u_diff,3));
+r_diff = out.r_diff';
+plot_data_findiff(q_des,dq_des,q_diff,dq_diff,dq_est,u_diff,u_ext,r_diff,P_ext,t);

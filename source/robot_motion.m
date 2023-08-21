@@ -1,7 +1,7 @@
 function robot_motion(robot,q,t)
 %showing the motion of the robot
 
-framesPerSecond = floor(size(t,2)/20);
+framesPerSecond = 20;% floor(size(t,2)/20);
 r = rateControl(framesPerSecond);
 config = homeConfiguration(robot);
 for i = 1:size(q,2)

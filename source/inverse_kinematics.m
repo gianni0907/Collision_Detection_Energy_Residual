@@ -1,4 +1,4 @@
-function [q] = inverse_kinematics(p,l,soln_type)
+function q = inverse_kinematics(p,l,soln_type)
 % compute inverse kinematics of 3R spatial manipulator
 % from Cartesian coordinates of ee position to joint configuration
 % input: Cartesian coordinates p = [x; y; z]
@@ -10,7 +10,11 @@ function [q] = inverse_kinematics(p,l,soln_type)
 %        3. 'np' for negative-positive
 %        4. 'nn' for negative-negative
 % output: joint configuration q = [q1; q2; q3]
-
+arguments
+    p (:,1) double
+    l (:,1) double
+    soln_type char = 'nn'
+end
 if (~strcmp(soln_type,'pp') && ~strcmp(soln_type,'pn') ...
     && ~strcmp(soln_type,'np') && ~strcmp(soln_type,'nn'))
     error("Specified solution type not valid");
