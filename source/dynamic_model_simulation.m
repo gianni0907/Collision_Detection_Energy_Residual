@@ -73,13 +73,18 @@ epsilon = 0.160981780095266;
 vmax = 2;  % [rad/s] useless in case of switching logic
 eta = 1;  % [rad/s]
 vbar = 2*eta+1;  % [rad/s]
-
 % set gain values for pd feedback, residual and reduced-order observer
 Kp = 1e2;
 Kd = 5e1;
 Ko = 1e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
-
+% choose method for velocity estimation:
+% 0: full state implmentation, velocity is available
+% 1: use reduced order observer for estimation
+% 2: use finite differences for estimation
+estimate_velocity=1;
+% threshold for the residual to detect a collision
+residual_threshold = 3;
 %% Define Cartesian motion
 % first motion: a circle in the y-z plane
 c = [0.4; 0.2; 0.7];  % center of the circle
@@ -132,16 +137,28 @@ s0 = ceil(norm(dq0)/vbar);
 out=sim('simulation.slx',[0 20]);
 
 t = out.tout';
-u_ext = out.u_ext';
+f_ext = out.f_ext';
 q_des = reshape(out.x_des(1:3,:,:),N,size(out.x_des,3));
 dq_des = reshape(out.x_des(4:6,:,:),N,size(out.x_des,3));
-P_ext = diag(dq_des'*u_ext)';
-% output from full state case
+p_des = reshape(out.p_des(1:3,:,:),N,size(out.x_des,3));
+dp_des = reshape(out.dp_des,N,size(out.x_des,3));
+p = reshape(out.p,N,size(out.x_des,3));
+dp = reshape(out.dp,N,size(out.x_des,3));
+
+P_ext = diag(dp'*f_ext)';
+
 q = reshape(out.x(1:3,:,:),N,size(out.x,3));
 dq = reshape(out.x(4:6,:,:),N,size(out.x,3));
 u = reshape(out.u,N,size(out.u,3));
 r = out.r';
-plot_data_fullstate(q_des,dq_des,q,dq,u,u_ext,r,P_ext,t);
+
+x2hat = out.x2hat';
+
+t_salient=[t0 t1 t2 t3 t4 t5];
+plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
+
+plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
+
 figure
 show(robot,homeConfiguration(robot));
 cla
@@ -155,20 +172,3 @@ plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
 plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
 
 robot_motion(robot,q,t);
-
-% output from reduced-order observer case
-q_obs = reshape(out.x_obs(1:3,:,:),N,size(out.x_obs,3));
-dq_obs = reshape(out.x_obs(4:6,:,:),N,size(out.x_obs,3));
-u_obs = reshape(out.u_obs,N,size(out.u_obs,3));
-r_obs = out.r_obs';
-dq_hat = out.x2hat';
-s = out.s';
-plot_data_redobs(q_des,dq_des,q_obs,dq_obs,dq_hat,u_obs,u_ext,r_obs,P_ext,s,vbar,eta,t);
-
-% output from finite differentiation velocity estimation
-q_diff = reshape(out.x_diff(1:3,:,:),N,size(out.x_diff,3));
-dq_diff = reshape(out.x_diff(4:6,:,:),N,size(out.x_diff,3));
-dq_est = reshape(out.x_est(4:6,:,:),N,size(out.x_est,3));
-u_diff = reshape(out.u_diff,N,size(out.u_diff,3));
-r_diff = out.r_diff';
-plot_data_findiff(q_des,dq_des,q_diff,dq_diff,dq_est,u_diff,u_ext,r_diff,P_ext,t);

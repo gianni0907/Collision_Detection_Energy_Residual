@@ -1,47 +1,65 @@
-function plot_data(q_des,dq_des,q_act,dq_act,u,t)
-%Plot the desired joint space configuration and velocities vs the actual
-%one executed by the robot
+function plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t)
 
+f=figure;
+f.WindowState='max';
 % first joint
-subplot(3,3,1)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[rad]","Interpreter","Latex"), title("$q_1$","Interpreter","Latex");
-plot(t,q_des(:,1));
-plot(t,q_act(:,1));
-legend('desired','actual');
-subplot(3,3,2)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[rad/s]","Interpreter","Latex"), title("$\dot{q}_1$","Interpreter","Latex");
-plot(t,dq_des(:,1));
-plot(t,dq_act(:,1));
-legend('desired','actual');
-subplot(3,3,3)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[Nm]","Interpreter","Latex"), title("$u_1$","Interpreter","Latex");
-plot(t,u(:,1));
-% second joint angle and velocity comparison
-subplot(3,3,4)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[rad]","Interpreter","Latex"), title("$q_2$","Interpreter","Latex");
-plot(t,q_des(:,2));
-plot(t,q_act(:,2));
-legend('desired','actual');
-subplot(3,3,5)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[rad/s]","Interpreter","Latex"), title("$\dot{q}_2$","Interpreter","Latex");
-plot(t,dq_des(:,2));
-plot(t,dq_act(:,2));
-legend('desired','actual');
-subplot(3,3,6)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[Nm]","Interpreter","Latex"), title("$u_2$","Interpreter","Latex");
-plot(t,u(:,2));
-% third joint angle and velocity comparison
-subplot(3,3,7)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[rad]","Interpreter","Latex"), title("$q_3$","Interpreter","Latex");
-plot(t,q_des(:,3));
-plot(t,q_act(:,3));
-legend('desired','actual');
-subplot(3,3,8)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[rad/s]","Interpreter","Latex"), title("$\dot{q}_3$","Interpreter","Latex");
-plot(t,dq_des(:,3));
-plot(t,dq_act(:,3));
-legend('desired','actual');
-subplot(3,3,9)
-hold on, xlabel("[s]","Interpreter","Latex"),ylabel("[Nm]","Interpreter","Latex"), title("$u_3$","Interpreter","Latex");
-plot(t,u(:,3));
+% subplot(5,1,1)
+% hold on, grid on, ylabel("$p \ [m]$","Interpreter","Latex");
+% plot(t,p(1,:)),
+% plot(t,p(2,:));
+% plot(t,p(3,:));
+% plot(t,p_des(1,:)),
+% plot(t,p_des(2,:));
+% plot(t,p_des(3,:));
+% legend("$p_x$","$p_y$","$p_z$","$p_{x,des}$","$p_{y,des}$","$p_{z,des}$","Interpreter","Latex");
+% 
+% subplot(5,1,2)
+% hold on, grid on, ylabel("$\dot{p} \ [m/s]$","Interpreter","Latex");
+% plot(t,dp(1,:)), hold on;
+% plot(t,dp(2,:));
+% plot(t,dp(3,:));
+% plot(t,dp_des(1,:)),
+% plot(t,dp_des(2,:));
+% plot(t,dp_des(3,:));
+% legend("$\dot{p}_x$","$\dot{p}_y$","$\dot{p}_z$",...
+%         "$\dot{p}_{x,des}$","$\dot{p}_{y,des}$","$\dot{p}_{z,des}$","Interpreter","Latex");
+
+subplot(5,1,1)
+hold on, grid on, ylabel("$p \ [m]$","Interpreter","Latex");
+plot(t,p(1,:)),
+plot(t,p(2,:));
+plot(t,p(3,:));
+xline(t_salient,'--k');
+legend("$p_x$","$p_y$","$p_z$","Interpreter","Latex","Orientation","Horizontal", ...
+    "Location","south");
+
+subplot(5,1,2)
+hold on, grid on, ylabel("$\dot{p} \ [m/s]$","Interpreter","Latex");
+plot(t,dp(1,:)), hold on;
+plot(t,dp(2,:));
+plot(t,dp(3,:));
+xline(t_salient,'--k');
+legend("$\dot{p}_x$","$\dot{p}_y$","$\dot{p}_z$","Interpreter","Latex","Orientation","Horizontal", ...
+    "Location","south");
+
+subplot(5,1,3)
+hold on, grid on, ylabel("$f_{ext} \ [N]$","Interpreter","Latex");
+plot(t,f_ext(1,:)), hold on;
+plot(t,f_ext(2,:));
+plot(t,f_ext(3,:));
+xline(t_salient,'--k');
+legend("$f_x$","$f_y$","$f_z$","Interpreter","Latex","Orientation","Horizontal", ...
+    "Location","south");
+
+subplot(5,1,4)
+plot(t,r)
+xline(t_salient,'--k');
+yline([residual_threshold -residual_threshold],'--r')
+grid on, ylabel("$r \ [W]$","Interpreter","Latex");
+
+subplot(5,1,5)
+plot(t,P_ext)
+xline(t_salient,'--k');
+grid on, ylabel("$P_{ext} \ [W]$","Interpreter","Latex"), xlabel("$t \ [s]$","Interpreter","Latex");
+
 end
