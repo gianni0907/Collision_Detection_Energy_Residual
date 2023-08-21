@@ -129,7 +129,7 @@ T0 = 0.5*dq0'*M0*dq0;
 s0 = ceil(norm(dq0)/vbar);
 
 %% run the simulation and show the results
-out=sim('simulation_prev.slx',[0 20]);
+out=sim('simulation.slx',[0 20]);
 
 t = out.tout';
 u_ext = out.u_ext';
