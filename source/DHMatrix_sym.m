@@ -1,4 +1,4 @@
-function [T, A] = DHMatrix(arrays)
+function [T, A] = DHMatrix_sym(arrays)
 % T = DHMatrix(arrays) takes as inputs:
 %   -arrays: a n-vector of vectors composed like this: [alpha a d theta]
 % and outputs:
@@ -8,10 +8,10 @@ function [T, A] = DHMatrix(arrays)
 % sin(q1 + q2) = cos(q1)*sin(q2) + cos(q2)*sin(q1)
 % making use of the simplify function these are converted automatically
 
-    T = eye(4);
+    T = sym(eye(4));
     nums = size(arrays);
     
-    A = zeros(4,4,nums(1));
+    A = sym(zeros(4,4,nums(1)));
     
     for i = 1:nums(1)
         line = arrays(i, :);
@@ -21,5 +21,9 @@ function [T, A] = DHMatrix(arrays)
              0 0 0 1];
         A(:,:,i) = R;
         T = T * R;   
+    end
+
+    if isa(T, 'sym')
+        T = simplify(T);
     end
 end

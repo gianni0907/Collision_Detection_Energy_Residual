@@ -8,14 +8,14 @@ N=3;  % number of joints
 l = [0.5 0.5 0.4]'; % link lengths [m]
 dc = [l(1)/2 l(2)/2 l(3)/2]'; % link CoMs (on local x axis) [m]
 m = [15 10 5]'; % link masses [kg]
-r = [0.2 0.1 0.1]'; % radius [m] of cylinder links with uniform mass 
+radius = [0.2 0.1 0.1]'; % radius [m] of cylinder links with uniform mass 
 I = zeros(3,3,N); % tensor containing the Inertia matrix of the links
-I(2,2,1) = (1/2)*m(1)*r(1)^2; % [kg*m^2]
-I(1,1,2) = (1/2)*m(2)*r(2)^2;
-I(2,2,2) = (1/12)*m(2)*(3*r(2)^2+l(2)^2);
+I(2,2,1) = (1/2)*m(1)*radius(1)^2; % [kg*m^2]
+I(1,1,2) = (1/2)*m(2)*radius(2)^2;
+I(2,2,2) = (1/12)*m(2)*(3*radius(2)^2+l(2)^2);
 I(3,3,2) = I(2,2,2);
-I(1,1,3) = (1/2)*m(3)*r(3)^2;
-I(2,2,3) = (1/12)*m(3)*(3*r(3)^2+l(3)^2);
+I(1,1,3) = (1/2)*m(3)*radius(3)^2;
+I(2,2,3) = (1/12)*m(3)*(3*radius(3)^2+l(3)^2);
 I(3,3,3) = I(2,2,3);
 pc = [0             -l(2)+dc(2) -l(3)+dc(3);
       -l(1)+dc(1)   0           0;
@@ -25,37 +25,137 @@ DHTABLE = [ pi/2      0         l(1)     0;
              0        l(2)        0      0;
              0        l(3)        0      0];
 
-% initialization of the state vector
-% q0 = rand(3,1)*2*pi-pi;
-% dq0 = rand(3,1)*10-5;
-q0 = [0 0 0]';
-dq0 = [0 0 0]';
-x0 = [q0' dq0']';
-DHTABLE = DHTABLE+[zeros(3,3) q0];
-[~,A0] = DHMatrix(DHTABLE);
-M0 = [modNE([0;0;0],[0;0;0],[1;0;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;1;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;0;1],m,I,A0,pc,0)];
-T0 = 0.5*dq0'*M0*dq0;
-% define joint space waypoints of the trajectory, associated instant of
-% time and velocity boundary conditions
-wp = [q0(1), pi/2, pi;
-      q0(2), pi/4, pi/2;
-      q0(3), pi/2, 0];
-tp = [0 5 10];
-boundary_vel = zeros(3,3);
+%% create the robot model
+dhparams = [DHTABLE(:,2) DHTABLE(:,1) DHTABLE(:,3:4)];
+robot = rigidBodyTree;
+body1 = rigidBody('body1');
+jnt1 = rigidBodyJoint('jnt1','revolute');
 
-% set gain values for pd feedback and residual gain
+setFixedTransform(jnt1,dhparams(1,:),'dh');
+body1.Joint = jnt1;
+
+addBody(robot,body1,'base');
+body2 = rigidBody('body2');
+jnt2 = rigidBodyJoint('jnt2','revolute');
+body3 = rigidBody('body3');
+jnt3 = rigidBodyJoint('jnt3','revolute');
+
+setFixedTransform(jnt2,dhparams(2,:),'dh');
+setFixedTransform(jnt3,dhparams(3,:),'dh');
+
+body2.Joint = jnt2;
+body3.Joint = jnt3;
+
+addBody(robot,body2,'body1');
+addBody(robot,body3,'body2');
+mat1 = [elem_rot_mat('x',pi/2) [0 -l(1)/2 0]';
+        zeros(1,3)              1];
+mat2 = [elem_rot_mat('y',pi/2)  [-l(2)/2 0 0]';
+        zeros(1,3)               1];
+mat3 = [elem_rot_mat('y',pi/2)  [-l(3)/2 0 0]';
+        zeros(1,3)               1];
+cylinder1 = collisionCylinder(radius(1),l(1));
+cylinder2 = collisionCylinder(radius(2),l(2));
+cylinder3 = collisionCylinder(radius(3),l(3));
+cylinder1.Pose = mat1;
+cylinder2.Pose = mat2;
+cylinder3.Pose = mat3;
+% addCollision(robot.Bodies{1},cylinder1);
+% addCollision(robot.Bodies{2},cylinder2);
+% addCollision(robot.Bodies{3},cylinder3);
+
+%% set parameters value for the simulation
+% implement switching logic for reduced-order observer gain scheduling
+c0bar = 1.961380728331336;
+lambda_1 = 0.047690409455136;
+lambda_2 = 1.840253279554651;
+epsilon = 0.160981780095266;
+vmax = 2;  % [rad/s] useless in case of switching logic
+eta = 1;  % [rad/s]
+vbar = 2*eta+1;  % [rad/s]
+
+% set gain values for pd feedback, residual and reduced-order observer
 Kp = 1e2;
 Kd = 5e1;
-Ko = 1e2;
+Ko = 1e1;
+K0 = c0bar*(vmax+eta)/(2*lambda_1);
+
+%% Define Cartesian motion
+% first motion: a circle in the y-z plane
+c = [0.4; 0.2; 0.7];  % center of the circle
+r_c = 0.3;  % circle radius
+T = 4; % period
+t0 = 2; % start of motion time
+% second motion: 
+
+% third motion: 
+p_i = [0.8 0.0 0.5];
+p_f = [0.0 0.8 0.5];
+time_int = [7 9];
+% check whether the points are out of workspace
+c3_i = (p_i(1)^2+p_i(2)^2+(p_i(3)-l(1))^2-l(2)^2-l(3)^2)/(2*l(2)*l(3));
+c3_f = (p_f(1)^2+p_f(2)^2+(p_f(3)-l(1))^2-l(2)^2-l(3)^2)/(2*l(2)*l(3));
+if (c3_i < -1 || c3_i > 1)
+    disp("Initial point out of workspace");
+    return
+end
+if (c3_f < -1 || c3_f > 1)
+    disp("Final point out of workspace");
+    return
+end
+
+% initialization of the state integrator
+% q0 = rand(N,1)*2*pi-pi;
+% dq0 = rand(N,1)*4*vmax-2*vmax;
+q0 = inverse_kinematics(p_i,l,'nn');
+dq0 = [0 0 0]';
+x0 = [q0; dq0];
+% initialization of the reduced observer integrator
+z0 = -K0*q0;
+% initialization of the residual intergrator
+[~,A0] = DHMatrix(DHTABLE+[zeros(3,3) q0]);
+M0 = [modNE([0;0;0],[0;0;0],[1;0;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;1;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;0;1],m,I,A0,pc,0)];
+T0 = 0.5*dq0'*M0*dq0;
+
+% initialization of the discrete integrator for the switching logic
+s0 = ceil(norm(dq0)/vbar);
+
 %% run the simulation and show the results
-DHTABLE(:,4) = zeros(3,1);
-out=sim('simulation.slx');
-q_des = reshape(out.x_des(1:3,:,:),N,size(out.x_des,3))';
-dq_des = reshape(out.x_des(4:6,:,:),N,size(out.x_des,3))';
-q_act = reshape(out.x(1:3,:,:),N,size(out.x,3))';
-dq_act = reshape(out.x(4:6,:,:),N,size(out.x,3))';
-u = reshape(out.u,N,size(out.u,3))';
-r = out.r;
-T = reshape(out.T,size(out.T,3),1);
-plot_data(q_des,dq_des,q_act,dq_act,u,r,T,out.tout);
-% robot_motion(DHTABLE,l,r,q_act);
+out=sim('simulation.slx',[0 20]);
+
+t = out.tout';
+u_ext = out.u_ext';
+q_des = reshape(out.x_des(1:3,:,:),N,size(out.x_des,3));
+dq_des = reshape(out.x_des(4:6,:,:),N,size(out.x_des,3));
+P_ext = diag(dq_des'*u_ext)';
+% output from full state case
+q = reshape(out.x(1:3,:,:),N,size(out.x,3));
+dq = reshape(out.x(4:6,:,:),N,size(out.x,3));
+u = reshape(out.u,N,size(out.u,3));
+r = out.r';
+% plot_data_fullstate(q_des,dq_des,q,dq,u,u_ext,r,P_ext,t);
+figure();
+show(robot,homeConfiguration(robot));
+cla
+hold on
+plot3(p_i(1),p_i(2),p_i(3),'.','MarkerSize',18);
+plot3(p_f(1),p_f(2),p_f(3),'.','MarkerSize',18);
+plot3([p_i(1),p_f(1)],[p_i(2),p_f(2)],[p_i(3),p_f(3)],'LineWidth',1.2);
+robot_motion(robot,q,t);
+
+% output from reduced-order observer case
+% q_obs = reshape(out.x_obs(1:3,:,:),N,size(out.x_obs,3));
+% dq_obs = reshape(out.x_obs(4:6,:,:),N,size(out.x_obs,3));
+% u_obs = reshape(out.u_obs,N,size(out.u_obs,3));
+% r_obs = out.r_obs';
+% dq_hat = out.x2hat';
+% s = out.s';
+% plot_data_redobs(q_des,dq_des,q_obs,dq_obs,dq_hat,u_obs,u_ext,r_obs,P_ext,s,vbar,eta,t);
+
+% output from finite differentiation velocity estimation
+% q_diff = reshape(out.x_diff(1:3,:,:),N,size(out.x_diff,3));
+% dq_diff = reshape(out.x_diff(4:6,:,:),N,size(out.x_diff,3));
+% dq_est = reshape(out.x_est(4:6,:,:),N,size(out.x_est,3));
+% u_diff = reshape(out.u_diff,N,size(out.u_diff,3));
+% r_diff = out.r_diff';
+% plot_data_findiff(q_des,dq_des,q_diff,dq_diff,dq_est,u_diff,u_ext,r_diff,P_ext,t);
