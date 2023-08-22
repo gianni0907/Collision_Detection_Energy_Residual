@@ -76,40 +76,41 @@ vbar = 2*eta+1;  % [rad/s]
 % set gain values for pd feedback, residual and reduced-order observer
 Kp = 1e2;
 Kd = 5e1;
-Ko = 1e1;
+Ko = 5e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
+
 % choose method for velocity estimation:
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
 estimate_velocity=1;
+
 % threshold for the residual to detect a collision
 residual_threshold = 3;
 %% Define Cartesian motion
 % first motion: a circle in the y-z plane
 c = [0.4; 0.2; 0.7];  % center of the circle
 r_c = 0.3;  % circle radius
-T = 4; % period
+T = 2; % period
 t0 = 2; % start of motion time
 p_init=c;
 p0 = [c(1); c(2)+r_c; c(3)];
 % rest phase: 
 t1 = t0+T;
-T_stop1 = 6;
+T_stop1 = 3;
 t2 = t1+T_stop1;
 % second motion:
 p1 = [0.8; c(2); c(3)];
-T_line1 = 2;
+T_line1 = 1;
 % rest phase:
 t3 = t2+T_line1;
 T_stop2 = 3;
 t4 = t3+T_stop2;
 % third motion: 
 p2 = [c(1);c(2)-r_c;c(3)];
-T_line2 = 2.5;
+T_line2 = 1.5;
 t5 = t4+T_line2;
-% rest phase
-T_stop3 = 0.5;
+
 % check whether the points are out of workspace
 if ~(check_in_workspace(p0,l) && check_in_workspace(p1,l) && ...
         check_in_workspace(p2,l) && ...
@@ -134,7 +135,7 @@ T0 = 0.5*dq0'*M0*dq0;
 s0 = ceil(norm(dq0)/vbar);
 
 %% run the simulation and show the results
-out=sim('simulation.slx',[0 20]);
+out=sim('simulation.slx',[0 15]);
 
 t = out.tout';
 f_ext = out.f_ext';
@@ -159,16 +160,16 @@ plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
 
 plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
 
-figure
-show(robot,homeConfiguration(robot));
-cla
-hold on
-plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
-t_c=0:0.05:T;
-plot3(c(1)*ones(size(t_c,2),1),c(2)+r_c*cos(2*pi/T*t_c),c(3)+r_c*sin(2*pi/T*t_c),'LineWidth',1.2)
-plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
-plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
-plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
-plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
-
-robot_motion(robot,q,t);
+% figure
+% show(robot,homeConfiguration(robot));
+% cla
+% hold on
+% plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
+% t_c=0:0.05:T;
+% plot3(c(1)*ones(size(t_c,2),1),c(2)+r_c*cos(2*pi/T*t_c),c(3)+r_c*sin(2*pi/T*t_c),'LineWidth',1.2)
+% plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
+% plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
+% plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
+% plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
+% 
+% robot_motion(robot,q,t);
