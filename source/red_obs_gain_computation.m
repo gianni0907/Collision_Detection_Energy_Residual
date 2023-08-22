@@ -38,34 +38,35 @@ matlabFunction(C,'File','get_c_factorization_matrix.m','Vars',[q2 q3 dq1 dq2 dq3
 % set an arbitrary maximum joint velocity and an arbitrary eta
 v_max = 2;  % [rad/s]
 eta = 1;  % [rad/s]
-% iterate over all the possible joint configurations for q2 and q3
-% and over all possible joint velocities
-lambda_1 = 1e6;
-lambda_2 = -1e6;
-c0bar = 0;
-for q2i=0.1:0.1:2*pi
-    for q3i=0.1:0.1:2*pi
-        eig_M = sort(eig(get_inertia_matrix(q2i,q3i)));
-        min_eig = eig_M(1);
-        max_eig = eig_M(end);
-        if min_eig/2 < lambda_1
-            lambda_1 = min_eig/2;
-        end
-        if max_eig/2 > lambda_2
-            lambda_2 = max_eig/2;
-        end
-        for dq1i=-v_max:0.1:v_max
-            for dq2i=-v_max:0.1:v_max
-                for dq3i=-v_max:0.1:v_max
-                    c0 = norm(get_c_factorization_matrix(q2i,q3i,dq1i,dq2i,dq3i))/norm([dq1i dq2i dq3i]);
-                    if c0 > c0bar
-                        c0bar = c0;
-                    end
-                end
-            end
-        end
-    end
-end
-% region of attraction
+%% find c0bar
+q2_l=-pi; q2_u=pi;
+q3_l=-pi; q3_u=pi;
+dq_l=ones(3,1)*-v_max; dq_u=ones(3,1)*v_max;
+%x is [q2,q3,dq1,dq2,dq3]
+x0=[pi/4,pi/4,1,1,1]';
+% tried with: active-set, sqp, interior point and always the same result.
+% tried with rand(5,1) as x0 and still the same result.
+sol=fmincon(@(x) -norm(get_c_factorization_matrix(x(1),x(2),x(3),x(4),x(5)))/norm(x(3:5)),...
+    x0,[], [], [], [], [q2_l;q3_l;dq_l], [q2_u;q3_u;dq_u]);
+c0bar = norm(get_c_factorization_matrix(sol(1),sol(2),sol(3),sol(4),sol(5)))/norm(sol(3:5))
+%% study eigenvalues of M
+lambda=eig(M);
+q2span = 0:0.01:2*pi;
+q3span = 0:0.01:2*pi;
+figure
+plot(q3span,subs(lambda(1),q3,q3span)),hold on,
+plot(q3span,subs(lambda(2),q3,q3span)),legend("first","second")
+min_first=min(subs(lambda(1),q3,q3span));
+max_second=max(subs(lambda(2),q3,q3span));
+
+figure
+f = @(x,y) cos(2*x + y)/2 + cos(y)/2 + (61*cos(x + y)^2)/240 + (247*cos(x)^2)/120 + 3/8;
+fs=fsurf(f,[0 2*pi 0 2*pi]);
+min_third=min(fs.ZData);
+max_third=max(fs.ZData);
+lambda_1 = min(min_first,min_third)
+lambda_2 = max(max_second,max_third)
+%% compute gain and region of exp stability
+% region of exp stability
 epsilon = eta*sqrt(lambda_1/lambda_2);
 K0 = c0bar*(v_max+eta)/(2*lambda_1);

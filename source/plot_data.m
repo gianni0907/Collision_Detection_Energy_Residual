@@ -56,9 +56,14 @@ legend("$f_x$","$f_y$","$f_z$","Interpreter","Latex","Orientation","Horizontal",
 xticks(time_axis)
 
 subplot(5,1,4)
-plot(t,r)
+hold on, plot(t,r)
 xline(t_salient,'--k');
 yline([residual_threshold -residual_threshold],'--r')
+for i=1:size(r,2)-1
+    if abs(r(i+1))>residual_threshold && abs(r(i))<residual_threshold
+        plot(t(i),r(i+1),'*r')
+    end
+end
 grid on, ylabel("$r \ [W]$","Interpreter","Latex");
 xticks(time_axis)
 

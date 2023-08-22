@@ -66,9 +66,9 @@ cylinder3.Pose = mat3;
 
 %% set parameters value for the simulation
 % implement switching logic for reduced-order observer gain scheduling
-c0bar = 1.961380728331336;
-lambda_1 = 0.047690409455136;
-lambda_2 = 1.840253279554651;
+c0bar = 1.962390280720058;
+lambda_1 = 0.094789482226257512094598012320061;
+lambda_2 = 59/16; %3.6875
 epsilon = 0.160981780095266;
 vmax = 2;  % [rad/s] useless in case of switching logic
 eta = 1;  % [rad/s]
@@ -83,7 +83,7 @@ K0 = c0bar*(vmax+eta)/(2*lambda_1);
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
-estimate_velocity=1;
+estimate_velocity=2;
 
 % threshold for the residual to detect a collision
 residual_threshold = 3;
