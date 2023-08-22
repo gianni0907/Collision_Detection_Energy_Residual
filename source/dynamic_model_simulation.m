@@ -100,7 +100,7 @@ t1 = t0+T;
 T_stop1 = 3;
 t2 = t1+T_stop1;
 % second motion:
-p1 = [0.8; c(2); c(3)];
+p1 = [0.85; c(2); c(3)];
 T_line1 = 1;
 % rest phase:
 t3 = t2+T_line1;
@@ -160,16 +160,16 @@ plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
 
 plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
 
-% figure
-% show(robot,homeConfiguration(robot));
-% cla
-% hold on
-% plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
-% t_c=0:0.05:T;
-% plot3(c(1)*ones(size(t_c,2),1),c(2)+r_c*cos(2*pi/T*t_c),c(3)+r_c*sin(2*pi/T*t_c),'LineWidth',1.2)
-% plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
-% plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
-% plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
-% plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
-% 
-% robot_motion(robot,q,t);
+figure
+show(robot,homeConfiguration(robot));
+cla
+hold on
+plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
+t_c=0:0.05:T;
+plot3(c(1)*ones(size(t_c,2),1),c(2)+r_c*cos(2*pi/T*t_c),c(3)+r_c*sin(2*pi/T*t_c),'LineWidth',1.2)
+plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
+plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
+plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
+plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
+
+robot_motion(robot,q,t);
