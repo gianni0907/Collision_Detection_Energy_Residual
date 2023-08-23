@@ -74,8 +74,8 @@ vmax = 2;  % [rad/s] useless in case of switching logic
 eta = 1;  % [rad/s]
 vbar = 2*eta+1;  % [rad/s]
 % set gain values for pd feedback, residual and reduced-order observer
-Kp = 1e2;
-Kd = 5e1;
+Kp = 5e2;
+Kd = 3e2;
 Ko = 5e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
 
@@ -83,10 +83,13 @@ K0 = c0bar*(vmax+eta)/(2*lambda_1);
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
-estimate_velocity=2;
+estimate_velocity=0;
 
 % threshold for the residual to detect a collision
 residual_threshold = 3;
+
+% enable or not the force on the robot
+enable_push=0;
 %% Define Cartesian motion
 % first motion: a circle in the y-z plane
 c = [0.4; 0.2; 0.7];  % center of the circle
@@ -142,7 +145,7 @@ f_ext = out.f_ext';
 q_des = reshape(out.x_des(1:3,:,:),N,size(out.x_des,3));
 dq_des = reshape(out.x_des(4:6,:,:),N,size(out.x_des,3));
 p_des = reshape(out.p_des(1:3,:,:),N,size(out.x_des,3));
-dp_des = reshape(out.dp_des,N,size(out.x_des,3));
+dp_des = out.dp_des';
 p = reshape(out.p,N,size(out.x_des,3));
 dp = reshape(out.dp,N,size(out.x_des,3));
 
@@ -160,16 +163,16 @@ plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
 
 plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
 
-figure
-show(robot,homeConfiguration(robot));
-cla
-hold on
-plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
-t_c=0:0.05:T;
-plot3(c(1)*ones(size(t_c,2),1),c(2)+r_c*cos(2*pi/T*t_c),c(3)+r_c*sin(2*pi/T*t_c),'LineWidth',1.2)
-plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
-plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
-plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
-plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
-
-robot_motion(robot,q,t);
+% figure
+% show(robot,homeConfiguration(robot));
+% cla
+% hold on
+% plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
+% t_c=0:0.05:T;
+% plot3(c(1)*ones(size(t_c,2),1),c(2)+r_c*cos(2*pi/T*t_c),c(3)+r_c*sin(2*pi/T*t_c),'LineWidth',1.2)
+% plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
+% plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
+% plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
+% plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
+% 
+% robot_motion(robot,q,t);

@@ -1,29 +1,35 @@
 function plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t)
 
 time_axis = sort([t_salient, 0, 5, 10, 15]);
+
+figure
+subplot(2,1,1)
+hold on, grid on, ylabel("$p \ [m]$","Interpreter","Latex");
+plot(t,p(1,:),'b'),
+plot(t,p(2,:),'r');
+plot(t,p(3,:),'m');
+plot(t,p_des(1,:),'b--'),
+plot(t,p_des(2,:),'r--');
+plot(t,p_des(3,:),'m--');
+xline(t_salient,'--k');
+xticks(time_axis)
+legend("$p_x$","$p_y$","$p_z$","$p_{x,des}$","$p_{y,des}$","$p_{z,des}$","Interpreter","Latex");
+
+subplot(2,1,2)
+hold on, grid on, ylabel("$\dot{p} \ [m/s]$","Interpreter","Latex");
+plot(t,dp(1,:),'b'), hold on;
+plot(t,dp(2,:),'r');
+plot(t,dp(3,:),'m');
+plot(t,dp_des(1,:),'b--'),
+plot(t,dp_des(2,:),'r--');
+plot(t,dp_des(3,:),'m--');
+xline(t_salient,'--k');
+xticks(time_axis)
+legend("$\dot{p}_x$","$\dot{p}_y$","$\dot{p}_z$",...
+        "$\dot{p}_{x,des}$","$\dot{p}_{y,des}$","$\dot{p}_{z,des}$","Interpreter","Latex");
+
 f=figure;
 f.WindowState='max';
-% first joint
-% subplot(5,1,1)
-% hold on, grid on, ylabel("$p \ [m]$","Interpreter","Latex");
-% plot(t,p(1,:)),
-% plot(t,p(2,:));
-% plot(t,p(3,:));
-% plot(t,p_des(1,:)),
-% plot(t,p_des(2,:));
-% plot(t,p_des(3,:));
-% legend("$p_x$","$p_y$","$p_z$","$p_{x,des}$","$p_{y,des}$","$p_{z,des}$","Interpreter","Latex");
-% 
-% subplot(5,1,2)
-% hold on, grid on, ylabel("$\dot{p} \ [m/s]$","Interpreter","Latex");
-% plot(t,dp(1,:)), hold on;
-% plot(t,dp(2,:));
-% plot(t,dp(3,:));
-% plot(t,dp_des(1,:)),
-% plot(t,dp_des(2,:));
-% plot(t,dp_des(3,:));
-% legend("$\dot{p}_x$","$\dot{p}_y$","$\dot{p}_z$",...
-%         "$\dot{p}_{x,des}$","$\dot{p}_{y,des}$","$\dot{p}_{z,des}$","Interpreter","Latex");
 
 subplot(5,1,1)
 hold on, grid on, ylabel("$p \ [m]$","Interpreter","Latex");
