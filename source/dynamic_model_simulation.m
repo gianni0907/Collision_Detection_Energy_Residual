@@ -74,8 +74,8 @@ vmax = 2;  % [rad/s] useless in case of switching logic
 eta = 1;  % [rad/s]
 vbar = 2*eta+1;  % [rad/s]
 % set gain values for pd feedback, residual and reduced-order observer
-Kp = 5e2;
-Kd = 3e2;
+Kp = 2e2;
+Kd = 1e2;
 Ko = 5e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
 
@@ -83,13 +83,13 @@ K0 = c0bar*(vmax+eta)/(2*lambda_1);
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
-estimate_velocity=0;
+estimate_velocity = 2;
 
 % threshold for the residual to detect a collision
-residual_threshold = 3;
+residual_threshold = 5;
 
 % enable or not the force on the robot
-enable_push=0;
+enable_push = 1;
 %% Define Cartesian motion
 % first motion: a circle in the y-z plane
 c = [0.4; 0.2; 0.7];  % center of the circle
@@ -103,7 +103,7 @@ t1 = t0+T;
 T_stop1 = 3;
 t2 = t1+T_stop1;
 % second motion:
-p1 = [0.85; c(2); c(3)];
+p1 = [0.75; c(2); c(3)];
 T_line1 = 1;
 % rest phase:
 t3 = t2+T_line1;
@@ -111,7 +111,7 @@ T_stop2 = 3;
 t4 = t3+T_stop2;
 % third motion: 
 p2 = [c(1);c(2)-r_c;c(3)];
-T_line2 = 1.5;
+T_line2 = 1;
 t5 = t4+T_line2;
 
 % check whether the points are out of workspace
@@ -128,11 +128,12 @@ q0 = inverse_kinematics(p_init,l,soln_type);
 dq0 = [0.5 -0.5 1]';
 x0 = [q0; dq0];
 % initialization of the reduced observer integrator
-z0 = -K0*q0;
+x2hat0 = zeros(3,1);
+z0 = x2hat0 - K0*q0;
 % initialization of the residual intergrator
 [~,A0] = DHMatrix(DHTABLE+[zeros(3,3) q0]);
 M0 = [modNE([0;0;0],[0;0;0],[1;0;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;1;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;0;1],m,I,A0,pc,0)];
-T0 = 0.5*dq0'*M0*dq0;
+T0 = 0.5*x2hat0'*M0*x2hat0;
 
 % initialization of the discrete integrator for the switching logic
 s0 = ceil(norm(dq0)/vbar);

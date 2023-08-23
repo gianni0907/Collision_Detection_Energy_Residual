@@ -67,7 +67,11 @@ xline(t_salient,'--k');
 yline([residual_threshold -residual_threshold],'--r')
 for i=1:size(r,2)-1
     if abs(r(i+1))>residual_threshold && abs(r(i))<residual_threshold
-        plot(t(i+1),r(i+1),'*r')
+        if norm(f_ext(:,i+1))>0
+            plot(t(i+1),r(i+1),'*g');
+        else
+            plot(t(i+1),r(i+1),'*k');
+        end
     end
 end
 grid on, ylabel("$r \ [W]$","Interpreter","Latex");
