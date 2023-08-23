@@ -90,6 +90,9 @@ residual_threshold = 5;
 
 % enable or not the force on the robot
 enable_push = 1;
+
+% set simulink simulation duration
+sim_time = 15; 
 %% Define Cartesian motion
 % first motion: a circle in the y-z plane
 c = [0.4; 0.2; 0.7];  % center of the circle
@@ -102,17 +105,17 @@ p0 = [c(1); c(2)+r_c; c(3)];
 t1 = t0+T;
 T_stop1 = 3;
 t2 = t1+T_stop1;
-% second motion:
-p1 = [0.6; c(2); c(3)];
+% second motion: a segment in x-y plane
+p1 = [0.7; c(2); c(3)];
 T_line1 = 1;
 % rest phase:
 t3 = t2+T_line1;
 T_stop2 = 3;
 t4 = t3+T_stop2;
-% third motion: 
-p2 = [c(1);c(2)-r_c;c(3)];
-T_line2 = 1;
-t5 = t4+T_line2;
+% third motion: one-quarter circle in x-z plane
+p2 = [c(1);c(2);c(3)-r_c];
+T2 = 2; % period of second circle
+t5 = t4+T2/4;
 
 % check whether the points are out of workspace
 if ~(check_in_workspace(p0,l) && check_in_workspace(p1,l) && ...
@@ -139,7 +142,7 @@ T0 = 0.5*x2hat0'*M0*x2hat0;
 s0 = ceil(norm(dq0)/vbar);
 
 %% run the simulation and show the results
-out=sim('simulation.slx',[0 15]);
+out=sim('simulation.slx',[0 sim_time]);
 
 t = out.tout';
 f_ext = out.f_ext';
@@ -169,11 +172,12 @@ plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
 % cla
 % hold on
 % plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
-% t_c=0:0.05:T;
-% plot3(c(1)*ones(size(t_c,2),1),c(2)+r_c*cos(2*pi/T*t_c),c(3)+r_c*sin(2*pi/T*t_c),'LineWidth',1.2)
+% t_1=0:0.05:T;
+% t_2=0:0.05:T2/4;
+% plot3(c(1)*ones(size(t_1,2),1),c(2)+r_c*cos(2*pi/T*t_1),c(3)+r_c*sin(2*pi/T*t_1),'LineWidth',1.2)
 % plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
 % plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
 % plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
-% plot3([p1(1),p2(1)],[p1(2),p2(2)],[p1(3),p2(3)],'LineWidth',1.2);
+% plot3(c(1)+r_c*cos(2*pi/T2*t_2),c(2)*ones(size(t_2,2),1),c(3)-r_c*sin(2*pi/T2*t_2),'LineWidth',1.2)
 % 
 % robot_motion(robot,q,t);
