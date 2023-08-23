@@ -74,8 +74,8 @@ vmax = 2;  % [rad/s] useless in case of switching logic
 eta = 1;  % [rad/s]
 vbar = 2*eta+1;  % [rad/s]
 % set gain values for pd feedback, residual and reduced-order observer
-Kp = 2e2;
-Kd = 1e2;
+Kp = 3e2;
+Kd = 5e1;
 Ko = 5e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
 
@@ -103,7 +103,7 @@ t1 = t0+T;
 T_stop1 = 3;
 t2 = t1+T_stop1;
 % second motion:
-p1 = [0.75; c(2); c(3)];
+p1 = [0.6; c(2); c(3)];
 T_line1 = 1;
 % rest phase:
 t3 = t2+T_line1;
