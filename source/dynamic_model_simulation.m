@@ -83,7 +83,7 @@ K0 = c0bar*(vmax+eta)/(2*lambda_1);
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
-estimate_velocity = 2;
+estimate_velocity = 0;
 
 % threshold for the residual to detect a collision
 residual_threshold = 5;
@@ -133,14 +133,16 @@ x0 = [q0; dq0];
 % initialization of the reduced observer integrator
 x2hat0 = zeros(3,1);
 z0 = x2hat0 - K0*q0;
-% initialization of the residual intergrator
+% initialization of the energy residual intergrator
 [~,A0] = DHMatrix(DHTABLE+[zeros(3,3) q0]);
 M0 = [modNE([0;0;0],[0;0;0],[1;0;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;1;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;0;1],m,I,A0,pc,0)];
 T0 = 0.5*x2hat0'*M0*x2hat0;
 
+% initialization of the momentum residual integrator
+m0 = modNE([0;0;0],[0;0;0],dq0,m,I,A0,pc,0);
+
 % initialization of the discrete integrator for the switching logic
 s0 = ceil(norm(dq0)/vbar);
-
 %% run the simulation and show the results
 out=sim('simulation.slx',[0 sim_time]);
 
