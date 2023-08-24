@@ -75,7 +75,7 @@ eta = 1;  % [rad/s]
 vbar = 2*eta+1;  % [rad/s]
 % set gain values for pd feedback, residual and reduced-order observer
 Kp = 3e2;
-Kd = 5e1;
+Kd = 3e1;
 Ko = 5e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
 
@@ -92,7 +92,7 @@ residual_threshold = 5;
 enable_push = 1;
 
 % set simulink simulation duration
-sim_time = 15; 
+sim_time = 13; 
 %% Define Cartesian motion
 % first motion: a circle in the y-z plane
 c = [0.4; 0.2; 0.7];  % center of the circle
@@ -112,10 +112,10 @@ T_line1 = 1;
 t3 = t2+T_line1;
 T_stop2 = 3;
 t4 = t3+T_stop2;
-% third motion: one-quarter circle in x-z plane
-p2 = [c(1);c(2);c(3)-r_c];
+% third motion: half circle in x-z plane
+p2 = [c(1)-r_c;c(2);c(3)];
 T2 = 2; % period of second circle
-t5 = t4+T2/4;
+t5 = t4+T2/2;
 
 % check whether the points are out of workspace
 if ~(check_in_workspace(p0,l) && check_in_workspace(p1,l) && ...
@@ -167,17 +167,17 @@ plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
 
 plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
 
-% figure
-% show(robot,homeConfiguration(robot));
-% cla
-% hold on
-% plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
-% t_1=0:0.05:T;
-% t_2=0:0.05:T2/4;
-% plot3(c(1)*ones(size(t_1,2),1),c(2)+r_c*cos(2*pi/T*t_1),c(3)+r_c*sin(2*pi/T*t_1),'LineWidth',1.2)
-% plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
-% plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
-% plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
-% plot3(c(1)+r_c*cos(2*pi/T2*t_2),c(2)*ones(size(t_2,2),1),c(3)-r_c*sin(2*pi/T2*t_2),'LineWidth',1.2)
-% 
-% robot_motion(robot,q,t);
+figure
+show(robot,homeConfiguration(robot));
+cla
+hold on
+plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
+t_1=0:0.05:T;
+t_2=0:0.05:T2/2;
+plot3(c(1)*ones(size(t_1,2),1),c(2)+r_c*cos(2*pi/T*t_1),c(3)+r_c*sin(2*pi/T*t_1),'LineWidth',1.2)
+plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
+plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
+plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
+plot3(c(1)+r_c*cos(2*pi/T2*t_2),c(2)*ones(size(t_2,2),1),c(3)-r_c*sin(2*pi/T2*t_2),'LineWidth',1.2)
+
+robot_motion(robot,q,t);
