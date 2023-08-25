@@ -76,5 +76,9 @@ plot(t,u(1,:));
 plot(t,u(2,:));
 plot(t,u(3,:));
 legend('$u_{1}$','$u_{2}$','$u_{3}$',"Interpreter","Latex");
-
+%% joint velocity norm
+figure;
+hold on,grid on,xlabel("$[s]$","Interpreter","Latex"),ylabel("$|| \dot{q} ||$","Interpreter","Latex");
+title("Joint velocity","Interpreter","Latex");
+plot(t,vecnorm(dq));
 end

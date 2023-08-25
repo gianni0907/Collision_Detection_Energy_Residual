@@ -83,14 +83,15 @@ K0 = c0bar*(vmax+eta)/(2*lambda_1);
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
-estimate_velocity = 0;
+estimate_velocity = 1;
 
 % threshold for the residual to detect a collision
 residual_threshold = 5;
 
-% enable or not the force on the robot
+% enable the force on the robot
 enable_push = 1;
-
+% enable mass increase by a given % in robot dynamics only
+mass_percent_uncertainty = 0;
 % set simulink simulation duration
 sim_time = 13; 
 %% Define Cartesian motion
@@ -169,17 +170,17 @@ plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
 
 plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
 
-figure
-show(robot,homeConfiguration(robot));
-cla
-hold on
-plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
-t_1=0:0.05:T;
-t_2=0:0.05:T2/2;
-plot3(c(1)*ones(size(t_1,2),1),c(2)+r_c*cos(2*pi/T*t_1),c(3)+r_c*sin(2*pi/T*t_1),'LineWidth',1.2)
-plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
-plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
-plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
-plot3(c(1)+r_c*cos(2*pi/T2*t_2),c(2)*ones(size(t_2,2),1),c(3)-r_c*sin(2*pi/T2*t_2),'LineWidth',1.2)
-
-robot_motion(robot,q,t);
+% figure
+% show(robot,homeConfiguration(robot));
+% cla
+% hold on
+% plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
+% t_1=0:0.05:T;
+% t_2=0:0.05:T2/2;
+% plot3(c(1)*ones(size(t_1,2),1),c(2)+r_c*cos(2*pi/T*t_1),c(3)+r_c*sin(2*pi/T*t_1),'LineWidth',1.2)
+% plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
+% plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
+% plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
+% plot3(c(1)+r_c*cos(2*pi/T2*t_2),c(2)*ones(size(t_2,2),1),c(3)-r_c*sin(2*pi/T2*t_2),'LineWidth',1.2)
+% 
+% robot_motion(robot,q,t);
