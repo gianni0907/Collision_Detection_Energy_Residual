@@ -71,7 +71,6 @@ lambda_1 = 0.094789482226257512094598012320061/2;
 lambda_2 = 59/32;
 vmax = 2;  % [rad/s] useless in case of switching logic
 eta = 1;  % [rad/s]
-vbar = 2*eta;  % [rad/s]
 epsilon = eta*sqrt(lambda_1/lambda_2);
 % set gain values for pd feedback, residual and reduced-order observer
 Kp = 3e2;
@@ -83,7 +82,7 @@ K0 = c0bar*(vmax+eta)/(2*lambda_1);
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
-estimate_velocity = 1;
+estimate_velocity = 2;
 
 % threshold for the residual to detect a collision
 residual_threshold = 5;
@@ -101,7 +100,7 @@ r_c = 0.3;  % circle radius
 T = 2; % period
 t0 = 2; % start of motion time
 p0 = [c(1); c(2)+r_c; c(3)];
-p_init=p0;
+p_init=c;
 % rest phase: 
 t1 = t0+T;
 T_stop1 = 3;
@@ -129,7 +128,7 @@ end
 % initialization of the state integrator
 soln_type = 'pn';
 q0 = inverse_kinematics(p_init,l,soln_type);
-dq0 = 0*[0.5 -0.5 1]';
+dq0 = [0.5 -0.5 1]';
 x0 = [q0; dq0];
 % initialization of the reduced observer integrator
 x2hat0 = zeros(3,1);
@@ -163,7 +162,7 @@ dq = reshape(out.x(4:6,:,:),N,size(out.x,3));
 u = reshape(out.u,N,size(out.u,3));
 r = out.r';
 
-x2hat = out.x2hat';
+x2hat = reshape(out.x2hat,N,size(out.x_des,3));
 
 t_salient=[t0 t1 t2 t3 t4 t5];
 plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
