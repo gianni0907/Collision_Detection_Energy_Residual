@@ -67,17 +67,17 @@ cylinder3.Pose = mat3;
 %% set parameters value for the simulation
 % implement switching logic for reduced-order observer gain scheduling
 c0bar = 1.962390280720058;
-lambda_1 = 0.094789482226257512094598012320061;
-lambda_2 = 59/16; %3.6875
-epsilon = 0.160981780095266;
+lambda_1 = 0.094789482226257512094598012320061/2;
+lambda_2 = 59/32;
 vmax = 2;  % [rad/s] useless in case of switching logic
 eta = 1;  % [rad/s]
 vbar = 2*eta+1;  % [rad/s]
+epsilon = eta*sqrt(lambda_1/lambda_2);
 % set gain values for pd feedback, residual and reduced-order observer
 Kp = 3e2;
 Kd = 3e1;
 Ko = 5e1;
-K0 = c0bar*(vmax+eta)/(2*lambda_1);
+K0 = 0.1*c0bar*(vmax+eta)/(2*lambda_1);
 
 % choose method for velocity estimation:
 % 0: full state implmentation, velocity is available
@@ -100,8 +100,8 @@ c = [0.4; 0.2; 0.7];  % center of the circle
 r_c = 0.3;  % circle radius
 T = 2; % period
 t0 = 2; % start of motion time
-p_init=c;
 p0 = [c(1); c(2)+r_c; c(3)];
+p_init=p0;
 % rest phase: 
 t1 = t0+T;
 T_stop1 = 3;
@@ -129,7 +129,7 @@ end
 % initialization of the state integrator
 soln_type = 'pn';
 q0 = inverse_kinematics(p_init,l,soln_type);
-dq0 = [0.5 -0.5 1]';
+dq0 = 0*[0.5 -0.5 1]';
 x0 = [q0; dq0];
 % initialization of the reduced observer integrator
 x2hat0 = zeros(3,1);
@@ -143,7 +143,7 @@ T0 = 0.5*x2hat0'*M0*x2hat0;
 m0 = modNE([0;0;0],[0;0;0],dq0,m,I,A0,pc,0);
 
 % initialization of the discrete integrator for the switching logic
-s0 = ceil(norm(dq0)/vbar);
+s0 = 1;
 %% run the simulation and show the results
 out=sim('simulation.slx',[0 sim_time]);
 
