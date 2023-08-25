@@ -40,11 +40,11 @@ addBody(robot,body2,'body1');
 addBody(robot,body3,'body2');
 
 mat1 = [elem_rot_mat('x',pi/2) [0 -L1/2 0]';
-        zeros(1,3)             1];
+        zeros(1,3)              1];
 mat2 = [elem_rot_mat('y',pi/2)  [-L2/2 0 0]';
-        zeros(1,3)             1];
+        zeros(1,3)               1];
 mat3 = [elem_rot_mat('y',pi/2)  [-L3/2 0 0]';
-        zeros(1,3)             1];
+        zeros(1,3)               1];
 cylinder1 = collisionCylinder(r1,L1);
 cylinder2 = collisionCylinder(r2,L2);
 cylinder3 = collisionCylinder(r3,L3);

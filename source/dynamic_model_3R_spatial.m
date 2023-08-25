@@ -29,12 +29,10 @@ N=3;  % number of joints
 DHTABLE = [ pi/2      0      sym('L1') sym('q1');
              0     sym('L2')    0      sym('q2');
              0     sym('L3')    0      sym('q3')];
-
-TDH = [ cos(theta) -sin(theta)*cos(alpha)  sin(theta)*sin(alpha) a*cos(theta);
-        sin(theta)  cos(theta)*cos(alpha) -cos(theta)*sin(alpha) a*sin(theta);
-          0             sin(alpha)             cos(alpha)            d;
-          0               0                      0                   1];
-
+TDH = [cos(theta) -sin(theta)*cos(alpha) sin(theta)*sin(alpha)  a*cos(theta);
+       sin(theta) cos(theta)*cos(alpha)  -cos(theta)*sin(alpha) a*sin(theta);
+       0          sin(alpha)             cos(alpha)             d;
+       0          0                      0                      1];
 for i = 1:N
     alpha = DHTABLE(i,1);
     a = DHTABLE(i,2);
