@@ -71,13 +71,13 @@ lambda_1 = 0.094789482226257512094598012320061/2;
 lambda_2 = 59/32;
 vmax = 2;  % [rad/s] useless in case of switching logic
 eta = 1;  % [rad/s]
-vbar = 2*eta+1;  % [rad/s]
+vbar = 2*eta;  % [rad/s]
 epsilon = eta*sqrt(lambda_1/lambda_2);
 % set gain values for pd feedback, residual and reduced-order observer
 Kp = 3e2;
 Kd = 3e1;
 Ko = 5e1;
-K0 = 0.1*c0bar*(vmax+eta)/(2*lambda_1);
+K0 = c0bar*(vmax+eta)/(2*lambda_1);
 
 % choose method for velocity estimation:
 % 0: full state implmentation, velocity is available
