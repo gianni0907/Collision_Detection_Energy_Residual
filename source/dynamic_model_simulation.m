@@ -163,7 +163,7 @@ dq = reshape(out.x(4:6,:,:),N,size(out.x,3));
 u = reshape(out.u,N,size(out.u,3));
 r = out.r';
 
-x2hat = out.x2hat';
+x2hat = reshape(out.x2hat,N,size(out.x_des,3));
 
 t_salient=[t0 t1 t2 t3 t4 t5];
 plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
