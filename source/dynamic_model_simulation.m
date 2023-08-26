@@ -82,7 +82,7 @@ K0 = c0bar*(vmax+eta)/(2*lambda_1);
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
-estimate_velocity = 2;
+estimate_velocity = 1;
 
 % threshold for the residual to detect a collision
 residual_threshold = 5;
