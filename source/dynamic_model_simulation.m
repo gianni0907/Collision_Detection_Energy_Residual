@@ -92,7 +92,7 @@ enable_push = 1;
 % enable mass increase by a given % in robot dynamics only
 mass_percent_uncertainty = 0;
 % set simulink simulation duration
-sim_time = 13; 
+sim_time = 13;
 %% Define Cartesian motion
 % first motion: a circle in the y-z plane
 c = [0.4; 0.2; 0.7];  % center of the circle
@@ -139,10 +139,8 @@ M0 = [modNE([0;0;0],[0;0;0],[1;0;0],m,I,A0,pc,0) modNE([0;0;0],[0;0;0],[0;1;0],m
 T0 = 0.5*x2hat0'*M0*x2hat0;
 
 % initialization of the momentum residual integrator
-m0 = modNE([0;0;0],[0;0;0],dq0,m,I,A0,pc,0);
+m0 = modNE([0;0;0],[0;0;0],x2hat0,m,I,A0,pc,0);
 
-% initialization of the discrete integrator for the switching logic
-s0 = 1;
 %% run the simulation and show the results
 out=sim('simulation.slx',[0 sim_time]);
 
