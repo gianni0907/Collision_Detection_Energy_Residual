@@ -44,11 +44,11 @@ legend('$\dot{q}_{3}$','$\hat{\dot{q}}_{3}$',"Interpreter","Latex");
 % plot error=actual-estimated velocities
 figure;
 hold on,grid on,xlabel("$[s]$","Interpreter","Latex"),ylabel("$[rad/s]$","Interpreter","Latex");
-title("Estimation error","Interpreter","Latex");
+title("Joint velocity estimation error","Interpreter","Latex");
 plot(t,dq(1,:)-dq_est(1,:));
 plot(t,dq(2,:)-dq_est(2,:));
 plot(t,dq(3,:)-dq_est(3,:));
-legend('$e_{1}$','$e_{2}$','$e_{3}$',"Interpreter","Latex");
+legend('$\epsilon_{1}$','$\epsilon_{2}$','$\epsilon_{3}$',"Interpreter","Latex");
 
 % real vs desired
 figure;

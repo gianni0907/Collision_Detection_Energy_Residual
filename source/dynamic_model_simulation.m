@@ -158,12 +158,17 @@ P_ext = diag(dp'*f_ext)';
 q = reshape(out.x(1:3,:,:),N,size(out.x,3));
 dq = reshape(out.x(4:6,:,:),N,size(out.x,3));
 u = reshape(out.u,N,size(out.u,3));
+r_mom = reshape(out.r_mom,N,size(out.u,3));
 r = out.r';
+u_ext = zeros(size(f_ext));
+for i=1:size(f_ext,2)
+    u_ext(:,i) = get_Jee(q(1,i),q(2,i),q(3,i))'*f_ext(:,i);
+end
 
 x2hat = reshape(out.x2hat,N,size(out.x_des,3));
 
 t_salient=[t0 t1 t2 t3 t4 t5];
-plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t);
+plot_data(p,dp,p_des,dp_des,f_ext,u_ext,r,r_mom,residual_threshold,P_ext,t_salient,t);
 
 plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
 

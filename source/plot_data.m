@@ -1,6 +1,39 @@
-function plot_data(p,dp,p_des,dp_des,f_ext,r,residual_threshold,P_ext,t_salient,t)
+function plot_data(p,dp,p_des,dp_des,f_ext,u_ext,r,r_mom,residual_threshold,P_ext,t_salient,t)
 
 time_axis = sort([t_salient, 0, 5, 10, 15]);
+
+figure
+subplot(3,1,1)
+hold on, grid on, ylabel("$r_{mom} \ [Nm]$","Interpreter","Latex");
+plot(t,r_mom(1,:)),
+plot(t,r_mom(2,:));
+plot(t,r_mom(3,:));
+xline(t_salient,'--k');
+xticks(time_axis)
+legend("$r_{mom,1}$","$r_{mom,2}$","$r_{mom,3}$","Interpreter","Latex");
+title("Vector residual","Interpreter","Latex");
+
+subplot(3,1,2)
+hold on, grid on, ylabel("$\tau_{ext} \ [Nm]$","Interpreter","Latex");
+plot(t,u_ext(1,:)),
+plot(t,u_ext(2,:));
+plot(t,u_ext(3,:));
+xline(t_salient,'--k');
+xticks(time_axis)
+legend("$\tau_{ext,1}$","$\tau_{ext,2}$","$\tau_{ext,3}$","Interpreter","Latex");
+title("$\tau_{ext}$","Interpreter","Latex")
+
+subplot(3,1,3)
+hold on, grid on, ylabel("$[Nm]$","Interpreter","Latex");
+plot(t,u_ext(1,:)-r_mom(1,:)),
+plot(t,u_ext(2,:)-r_mom(2,:));
+plot(t,u_ext(3,:)-r_mom(3,:));
+xline(t_salient,'--k');
+xticks(time_axis)
+legend("$e_{1}$","$e_{2}$","$e_{3}$","Interpreter","Latex");
+title("$\tau_{ext}-r_{mom}$","Interpreter","Latex")
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure
 subplot(2,1,1)
@@ -14,6 +47,7 @@ plot(t,p_des(3,:),'m--');
 xline(t_salient,'--k');
 xticks(time_axis)
 legend("$p_x$","$p_y$","$p_z$","$p_{x,des}$","$p_{y,des}$","$p_{z,des}$","Interpreter","Latex");
+title("Cartesian quantities $p$ and $\dot{p}$","Interpreter","Latex");
 
 subplot(2,1,2)
 hold on, grid on, ylabel("$\dot{p} \ [m/s]$","Interpreter","Latex");
@@ -27,6 +61,8 @@ xline(t_salient,'--k');
 xticks(time_axis)
 legend("$\dot{p}_x$","$\dot{p}_y$","$\dot{p}_z$",...
         "$\dot{p}_{x,des}$","$\dot{p}_{y,des}$","$\dot{p}_{z,des}$","Interpreter","Latex");
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 f=figure;
 f.WindowState='max';
