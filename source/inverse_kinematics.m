@@ -1,7 +1,7 @@
 function q = inverse_kinematics(p,l,soln_type)
 % compute inverse kinematics of 3R spatial manipulator
 % from Cartesian coordinates of ee position to joint configuration
-% input: Cartesian coordinates p = [x; y; z]
+% Input: Cartesian coordinates p = [x; y; z]
 %        link lengths l = [l1; l2; l3]
 %        specified solution among the 4 possibilities
 %        soln_type is a string containing one of the following
@@ -9,7 +9,8 @@ function q = inverse_kinematics(p,l,soln_type)
 %        2. 'pn' for positive-negative
 %        3. 'np' for negative-positive
 %        4. 'nn' for negative-negative
-% output: joint configuration q = [q1; q2; q3]
+% Output: joint configuration q = [q1; q2; q3]
+
 arguments
     p (:,1) double
     l (:,1) double

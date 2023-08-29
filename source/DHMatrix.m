@@ -1,17 +1,20 @@
 function [T, A] = DHMatrix(arrays)
-% T = DHMatrix(arrays) takes as inputs:
+% Input:
 %   -arrays: a n-vector of vectors composed like this: [alpha a d theta]
-% and outputs:
+% Output:
 %   -T: the product of all the matrices corresponding to each vector of arrays
-% Remember that:
-% cos(q1 + q2) = cos(q1)*cos(q2) - sin(q1)*sin(q2)
-% sin(q1 + q2) = cos(q1)*sin(q2) + cos(q2)*sin(q1)
-% making use of the simplify function these are converted automatically
+%   -A: 4x4xn tensor containing the homogeneous transformation matrices
+%       between consecutive frames
 
-    T = eye(4);
     nums = size(arrays);
-    
-    A = zeros(4,4,nums(1));
+
+    if isa(arrays,'sym')
+        T = sym(eye(4));
+        A = sym(zeros(4,4,nums(1)));
+    else
+        T = eye(4);
+        A = zeros(4,4,nums(1));
+    end
     
     for i = 1:nums(1)
         line = arrays(i, :);
@@ -21,5 +24,9 @@ function [T, A] = DHMatrix(arrays)
              0 0 0 1];
         A(:,:,i) = R;
         T = T * R;   
+    end
+    
+    if isa(T, 'sym')
+        T = simplify(T);
     end
 end

@@ -17,6 +17,8 @@ I(3,3,2) = I(2,2,2);
 I(1,1,3) = (1/2)*m(3)*radius(3)^2;
 I(2,2,3) = (1/12)*m(3)*(3*radius(3)^2+l(3)^2);
 I(3,3,3) = I(2,2,3);
+
+% matrix of link CoMs
 pc = [0             -l(2)+dc(2) -l(3)+dc(3);
       -l(1)+dc(1)   0           0;
       0             0           0];
@@ -65,16 +67,18 @@ cylinder3.Pose = mat3;
 % addCollision(robot.Bodies{3},cylinder3);
 
 %% set parameters value for the simulation
-% implement switching logic for reduced-order observer gain scheduling
+% parameters obtained via "compute_vel_obs_gain.m"
 c0bar = 1.962390280720058;
-lambda_1 = 0.094789482226257512094598012320061/2;
+lambda_1 = 0.04739474111312875604729900616003;
 lambda_2 = 59/32;
-vmax = 2;  % [rad/s] useless in case of switching logic
+vmax = 4;  % [rad/s] 
 eta = 1;  % [rad/s]
 epsilon = eta*sqrt(lambda_1/lambda_2);
+
 % set gain values for pd feedback, residual and reduced-order observer
-Kp = 2e1;
-Kd = 2e1;
+Kp = 7e1;
+Kd = 7e1;
+
 Ko = 5e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
 
@@ -82,10 +86,10 @@ K0 = c0bar*(vmax+eta)/(2*lambda_1);
 % 0: full state implmentation, velocity is available
 % 1: use reduced order observer for estimation
 % 2: use finite differences for estimation
-estimate_velocity = 1;
+estimate_velocity = 2;
 
 % threshold for the residual to detect a collision
-residual_threshold = 5;
+residual_threshold = 8;
 
 % enable the force on the robot
 enable_push = 1;
@@ -99,19 +103,23 @@ c = [0.4; 0.2; 0.7];  % center of the circle
 r_c = 0.3;  % circle radius
 T = 2; % period
 t0 = 2; % start of motion time
-p0 = [c(1); c(2)+r_c; c(3)];
-p_init=c;
+p0 = [c(1); c(2)+r_c; c(3)]; %initial point on the circle
+p_init=c; % starting end-effector position
+
 % rest phase: 
 t1 = t0+T;
 T_stop1 = 3;
 t2 = t1+T_stop1;
+
 % second motion: a segment in x-y plane
 p1 = [0.7; c(2); c(3)];
 T_line1 = 1;
+
 % rest phase:
 t3 = t2+T_line1;
 T_stop2 = 3;
 t4 = t3+T_stop2;
+
 % third motion: half circle in x-z plane
 p2 = [c(1)-r_c;c(2);c(3)];
 T2 = 2; % period of second circle
@@ -158,8 +166,8 @@ P_ext = diag(dp'*f_ext)';
 q = reshape(out.x(1:3,:,:),N,size(out.x,3));
 dq = reshape(out.x(4:6,:,:),N,size(out.x,3));
 u = reshape(out.u,N,size(out.u,3));
-r_mom = reshape(out.r_mom,N,size(out.u,3));
-r = out.r';
+r = reshape(out.r,N,size(out.u,3));
+sigma = out.sigma';
 u_ext = zeros(size(f_ext));
 for i=1:size(f_ext,2)
     u_ext(:,i) = get_Jee(q(1,i),q(2,i),q(3,i))'*f_ext(:,i);
@@ -167,22 +175,10 @@ end
 
 x2hat = reshape(out.x2hat,N,size(out.x_des,3));
 
-t_salient=[t0 t1 t2 t3 t4 t5];
-plot_data(p,dp,p_des,dp_des,f_ext,u_ext,r,r_mom,residual_threshold,P_ext,t_salient,t);
+t_salient=[t0 t1 t2 t3 t4 t5 5]; % where to have the vertical dashed lines
 
-plot_joint_level(q_des,dq_des,q,dq,x2hat,u,t);
+plot_data(p,dp,p_des,dp_des,f_ext,u_ext,sigma,r,residual_threshold,P_ext,t_salient,t);
 
-% figure
-% show(robot,homeConfiguration(robot));
-% cla
-% hold on
-% plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
-% t_1=0:0.05:T;
-% t_2=0:0.05:T2/2;
-% plot3(c(1)*ones(size(t_1,2),1),c(2)+r_c*cos(2*pi/T*t_1),c(3)+r_c*sin(2*pi/T*t_1),'LineWidth',1.2)
-% plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
-% plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
-% plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
-% plot3(c(1)+r_c*cos(2*pi/T2*t_2),c(2)*ones(size(t_2,2),1),c(3)-r_c*sin(2*pi/T2*t_2),'LineWidth',1.2)
-% 
-% robot_motion(robot,q,t);
+plot_joint_space(q_des,dq_des,q,dq,x2hat,u,u_ext,t_salient,t);
+
+%robot_motion(robot,q,p0,p1,p2,c,r_c,T,T2,t);

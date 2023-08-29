@@ -1,6 +1,7 @@
 clear variables
 clc
-
+% script to generate functions to retrieve the linear part of the end
+% effector jacobian and its derivative
 syms q1 q2 q3 dq1 dq2 dq3 l1 l2 l3 real
 q = [q1 q2 q3]';
 dq = [dq1 dq2 dq3]';

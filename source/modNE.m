@@ -1,5 +1,16 @@
 function u = modNE(dq,v,ddq,m,I,A,pc,g0)
 % Implementation of Modified Newton-Euler algorithm
+% Input:
+%     - dq: joint velocity used to compute C(q,dq)
+%     - v: velocity to multiply by the factorization matrix, i.e., C(q,dq)v
+%     - ddq: joint acceleration
+%     - m: mass vector
+%     - I: 3x3xn tensor of inertia matrices
+%     - A: 4x4xn tensor of homogeneous transformations between consecutive frames
+%     - pc: 3xn matrix with the i-th column being the CoM of the i-th link, expressed in the i-th frame
+%     - g0: scalar gravity acceleration
+% Output:
+%     - inverse dynamics: u=M(q)ddq+C(q,dq)v+g(q)
 
 n = size(dq,1);
 % check dimension consistency
@@ -14,14 +25,26 @@ end
 % initialization
 R = A(1:3,1:3,:);
 p = [R(:,:,1)'*A(1:3,4,1) R(:,:,2)'*A(1:3,4,2) R(:,:,3)'*A(1:3,4,3)];
-w = zeros(3,n+1);
-wa = zeros(3,n+1);
-dw = zeros(3,n+1);
-a = zeros(3,n+1)-[[0 0 -g0]' zeros(3,n)];
-ac = zeros(3,n+1);
-f = zeros(3,n+1);
-t = zeros(3,n+1);
-u = zeros(n,1);
+
+if isa(A,'sym')
+    w = sym(zeros(3,n+1));
+    wa = sym(zeros(3,n+1));
+    dw = sym(zeros(3,n+1));
+    a = sym(zeros(3,n+1))-[[0 0 -g0]' sym(zeros(3,n))];
+    ac = sym(zeros(3,n+1));
+    f = sym(zeros(3,n+1));
+    t = sym(zeros(3,n+1));
+    u = sym(zeros(n,1));
+else
+    w = zeros(3,n+1);
+    wa = zeros(3,n+1);
+    dw = zeros(3,n+1);
+    a = zeros(3,n+1)-[[0 0 -g0]' zeros(3,n)];
+    ac = zeros(3,n+1);
+    f = zeros(3,n+1);
+    t = zeros(3,n+1);
+    u = zeros(n,1);
+end
 
 % forward recursion
 for i = 2:n+1
