@@ -1,7 +1,14 @@
-function robot_motion(robot,q,p0,p1,p2,c,r_c,f_ext,T,T2,t,save_video)
+function robot_motion(robot,q,p0,p1,p2,c,r_c,f_ext,T,T2,t,save_video,uniform_time)
 % showing the motion of the robot
+if uniform_time
+    t_fixed = 0:0.05:max(t);
+    q=interp1(t,q',t_fixed)';
+    f_ext=interp1(t,f_ext',t_fixed)';
+    t=t_fixed;
+end
+
 if save_video
-    v = VideoWriter("videos/robot.avi");
+    v = VideoWriter("videos/robot_soft.avi");
     v.FrameRate=floor(size(t,2)/max(t));
     v.Quality=100;
     open(v)
@@ -15,7 +22,7 @@ hold on
 xlim([-1 1])
 ylim([-1 1])
 zlim([-0.1 1])
-patch([1 -1 -1 1], [1 1 -1 -1], [0 0 0 0], [0.1843 0.3098 0.3098],'FaceAlpha',0.5)  
+% patch([1 -1 -1 1], [1 1 -1 -1], [0 0 0 0], [0.1843 0.3098 0.3098],'FaceAlpha',0.5)  
 plot3(p0(1),p0(2),p0(3),'.','MarkerSize',18);
 t_1=0:0.05:T;
 t_2=0:0.05:T2/2;
@@ -26,7 +33,7 @@ plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
 plot3(c(1)+r_c*cos(2*pi/T2*t_2),c(2)*ones(size(t_2,2),1),c(3)-r_c*sin(2*pi/T2*t_2),'LineWidth',1.2)
 pause
 
-framesPerSecond = 20;
+framesPerSecond = floor(size(t,2)/max(t));
 r = rateControl(framesPerSecond);
 config = homeConfiguration(robot);
 h=quiver3(0,0,0,0,0,0,'AutoScaleFactor',1/70,'LineWidth',2,'Color',[0 0 1]);
