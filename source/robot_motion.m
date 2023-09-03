@@ -1,14 +1,8 @@
-function robot_motion(robot,q,p0,p1,p2,c,r_c,f_ext,T,T2,t,save_video,uniform_time)
+function robot_motion(robot,q,p0,p1,p2,c,r_c,f_ext,T,T2,t,save_video)
 % showing the motion of the robot
-if uniform_time
-    t_fixed = 0:0.05:max(t);
-    q=interp1(t,q',t_fixed)';
-    f_ext=interp1(t,f_ext',t_fixed)';
-    t=t_fixed;
-end
 
 if save_video
-    v = VideoWriter("videos/robot_soft.avi");
+    v = VideoWriter("videos/robot.avi");
     v.FrameRate=floor(size(t,2)/max(t));
     v.Quality=100;
     open(v)

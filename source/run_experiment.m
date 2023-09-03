@@ -176,10 +176,9 @@ end
 x2hat = reshape(out.x2hat,N,size(out.x_des,3));
 
 t_salient=[t0 t1 t2 t3 t4 t5 5]; % where to have the vertical dashed lines
-
-% plot_data(p,dp,p_des,dp_des,f_ext,u_ext,sigma,r,residual_threshold,P_ext,t_salient,t);
-% 
-% plot_joint_space(q_des,dq_des,q,dq,x2hat,u,u_ext,t_salient,t);
 save_video = 1;
-uniform_time = 1;
-robot_motion(robot,q,p0,p1,p2,c,r_c,f_ext,T,T2,t,save_video,uniform_time);
+
+plot_data(p,dp,p_des,dp_des,f_ext,u_ext,sigma,r,residual_threshold,P_ext,t_salient,t,save_video);
+
+plot_joint_space(q_des,dq_des,q,dq,x2hat,u,u_ext,t_salient,t);
+robot_motion(robot,q,p0,p1,p2,c,r_c,f_ext,T,T2,t,save_video);
