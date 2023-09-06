@@ -44,6 +44,10 @@ The simulations carried out compare:
 
 The following video - also in `media/video.mp4` file - shows the obtained results for the second comparison
 
-https://github.com/gianni0907/Collision_Detection_Energy_Residual/assets/
+
+
+https://github.com/gianni0907/Collision_Detection_Energy_Residual/assets/72451400/8653ded3-b0b4-4260-8960-5c79b2acaa78
+
+
 
 Further details are available in the report.
