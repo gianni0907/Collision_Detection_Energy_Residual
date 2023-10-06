@@ -46,7 +46,7 @@ The structure of the code in `source/` is detailed in the following.
  	- `get_inertia_matrix.m` returns the matrix $\mathbf{M}(\mathbf{q})$
   	- `get_c_factorization_matrix.m` returns a factorization matrix $\mathbf{C}(\mathbf{q},\dot{\mathbf{q}})$ that ensures the skew-symmetry of $\dot{\mathbf{M}}(\mathbf{q})-2\mathbf{C}(\mathbf{q},\dot{\mathbf{q}})$
 * `elem_rot_mat.m`: returns the rotation matrix given an axis (x,y,z) and an angle
-* 'inverse_kinematics.m`: compute inverse kinematics of 3R spatial manipulator from the end effector Cartesian position. A parameter chooses which of the 4 closed-form solutions to choose. This is used for the initial configuration, while online a numerical method is used.
+* `inverse_kinematics.m`: compute inverse kinematics of 3R spatial manipulator from the end effector Cartesian position. A parameter allows to select among the 4 closed-form solutions. This is used for the initial configuration, while online the Levenberg_Marquardt solver offered by the Robotics Toolbox is used.
 * `modNE.m`: implementation of the modified Newton Euler algorithm from "[Alessandro De Luca and Lorenzo Ferrajoli. A modified newton-euler method for dynamic computations in robot fault detection and control](https://ieeexplore.ieee.org/document/5152618)". The implemented variant ensures the skew-symmetry of $\dot{\mathbf{M}}(\mathbf{q})-2\mathbf{C}(\mathbf{q},\dot{\mathbf{q}})$
 * `plot_data.m`, `plot_joint_space.m`: plotting functions for data coming from the simulation
 * `robot_motion.m`: visualize the robot motion
@@ -55,7 +55,7 @@ The structure of the code in `source/` is detailed in the following.
 
 ### How to run
 Simply clone the repository and run `run_experiment.m`. Relevant parameters that are free to tweak are
-* `estimate_velocity`: choose whether to estimate $\dot{\mathbf{q}}$ via numerical differentiation (`estimate_velocity=2`), use the velocity oserver (`estimate_velocity=1`), or use the ground truth value (`estimate_velocity=0`).
+* `estimate_velocity`: choose whether to estimate $\dot{\mathbf{q}}$ via numerical differentiation (`estimate_velocity=2`), use the velocity observer (`estimate_velocity=1`), or use the ground truth value (`estimate_velocity=0`).
 * `residual_threshold`: choose the threshold for $\sigma(t)$ for collision detection
 * `enable_push`: choose whether to push the robot (`enable_push=1`) or not
 * `mass_percent_uncertainty`: choose the percentage by which increasing the mass in the robot dynamics with respect to the value used elsewhere. This is to test the robustness of the collision detection pipeline to model uncertainties.
