@@ -50,11 +50,17 @@ The structure of the code in `source/` is detailed in the following.
 * `modNE.m`: implementation of the modified Newton Euler algorithm from "[Alessandro De Luca and Lorenzo Ferrajoli. A modified newton-euler method for dynamic computations in robot fault detection and control](https://ieeexplore.ieee.org/document/5152618)". The implemented variant ensures the skew-symmetry of $\dot{\mathbf{M}}(\mathbf{q})-2\mathbf{C}(\mathbf{q},\dot{\mathbf{q}})$
 * `plot_data.m`, `plot_joint_space.m`: plotting functions for data coming from the simulation
 * `robot_motion.m`: visualize the robot motion
-* `run_experiment.m`: **main file. It defines all the robot parameters and runs the simulation**. It is possible to choose whether to estimate $\dot{\mathbf{q}}$ via numerical differentiation, the velocity oserver, or use the ground truth value.
+* `run_experiment.m`: **main file. It defines all the robot parameters and runs the simulation**.
 * `simulation.slx`: **simulink file**. It contains the block scheme for the simulation. It is run by `run_experiment.m`
 
 ### How to run
-Simply clone the repository and run `run_experiment.m`. At the end of the simulation, all the plots will appear along with the visualization of the robot.
+Simply clone the repository and run `run_experiment.m`. Relevant parameters that are free to tweak are
+* `estimate_velocity`: choose whether to estimate $\dot{\mathbf{q}}$ via numerical differentiation (`estimate_velocity=2`), use the velocity oserver (`estimate_velocity=1`), or use the ground truth value (`estimate_velocity=0`).
+* `residual_threshold`: choose the threshold for $\sigma(t)$ for collision detection
+* `enable_push`: choose whether to push the robot (`enable_push=1`) or not
+* `mass_percent_uncertainty`: choose the percentage by which increasing the mass in the robot dynamics with respect to the value used elsewhere. This is to test the robustness of the collision detection pipeline to model uncertainties.
+
+At the end of the simulation, all the plots will appear along with the visualization of the robot.
 
 ## Simulations
 The simulations carried out compare:
