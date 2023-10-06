@@ -25,8 +25,7 @@ Assuming ideal conditions, the dynamics is
 so it will be used as a virtual sensor of the torque generated in a collision.
 
 ## Reduced-order observer
-Assumin $\dot{\mathbf{q}}$ not available for measurement, we detail a reduced-order observer following "[Andrea Cristofaro and Alessandro De Luca. Reduced-order observer design
-for robot manipulators](https://ieeexplore.ieee.org/document/9849836)".
+Assuming $\dot{\mathbf{q}}$ not available for measurement, we detail a reduced-order observer following "[Andrea Cristofaro and Alessandro De Luca. Reduced-order observer design for robot manipulators](https://ieeexplore.ieee.org/document/9849836)".
 
 ## Overall block scheme
 The experiments are performed following the scheme - also in `media/block_scheme.jpg`
@@ -34,6 +33,28 @@ The experiments are performed following the scheme - also in `media/block_scheme
 ![Block scheme](media/block_scheme.jpg)
 
 Further details on the components of the scheme are available in `report.pdf`.
+
+## Repository structure
+The structure of the code in `source/` is detailed in the following.
+* `DHMatrix.m`: computes the DH transformation matrices from the DH table
+* `check_in_workspace.m`: given the link lengths l and the point p, checks if the point is inside the workspace.
+* `compute_eeJacbobian.m`: script that generates the following functions
+	- `get_pee.m` get the end-effector position
+ 	- `get_Jee.m` get linear part of the end effector jacobian
+  	- `get_dJee.m` get the derivative of the linear part of the end effector jacobian
+* `compute_vel_obs_gain.m`: script that computes the gain to use in the velocity observer using $v_{max}=4\ [rad/s],\ \eta=1\ [rad/s]$. It generates the following functions
+ 	- `get_inertia_matrix.m` returns the matrix $\mathbf{M}(\mathbf{q})$
+  	- `get_c_factorization_matrix.m` returns a factorization matrix $\mathbf{C}(\mathbf{q},\dot{\mathbf{q}})$ that ensures the skew-symmetry of $\dot{\mathbf{M}}(\mathbf{q})-2\mathbf{C}(\mathbf{q},\dot{\mathbf{q}})$
+* `elem_rot_mat.m`: returns the rotation matrix given an axis (x,y,z) and an angle
+* 'inverse_kinematics.m`: compute inverse kinematics of 3R spatial manipulator from the end effector Cartesian position. A parameter chooses which of the 4 closed-form solutions to choose. This is used for the initial configuration, while online a numerical method is used.
+* `modNE.m`: implementation of the modified Newton Euler algorithm from "[Alessandro De Luca and Lorenzo Ferrajoli. A modified newton-euler method for dynamic computations in robot fault detection and control](https://ieeexplore.ieee.org/document/5152618)". The implemented variant ensures the skew-symmetry of $\dot{\mathbf{M}}(\mathbf{q})-2\mathbf{C}(\mathbf{q},\dot{\mathbf{q}})$
+* `plot_data.m`, `plot_joint_space.m`: plotting functions for data coming from the simulation
+* `robot_motion.m`: visualize the robot motion
+* `run_experiment.m`: **main file. It defines all the robot parameters and runs the simulation**. It is possible to choose whether to estimate $\dot{\mathbf{q}}$ via numerical differentiation, the velocity oserver, or use the ground truth value.
+* `simulation.slx`: **simulink file**. It contains the block scheme for the simulation. It is run by `run_experiment.m`
+
+### How to run
+Simply clone the repository and run `run_experiment.m`. At the end of the simulation, all the plots will appear along with the visualization of the robot.
 
 ## Simulations
 The simulations carried out compare:
@@ -44,10 +65,7 @@ The simulations carried out compare:
 
 The following video - also in `media/video.mp4` file - shows the obtained results for the second comparison
 
-
-
-https://github.com/gianni0907/Collision_Detection_Energy_Residual/assets/72451400/8653ded3-b0b4-4260-8960-5c79b2acaa78
-
+https://github.com/gianni0907/Collision_Detection_Energy_Residual/assets/72447693/35204628-dff1-4199-9ac4-466ea9dc3637
 
 
 Further details are available in the report.
