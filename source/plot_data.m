@@ -2,6 +2,9 @@ function plot_data(p,dp,p_des,dp_des,f_ext,u_ext,sigma,r,residual_threshold,P_ex
 
 time_axis = sort([t_salient, 0, 10]);
 if save_video
+    if ~exist("videos/", 'dir')
+       mkdir("videos/")
+    end
     v = VideoWriter("videos/robot_plots.avi");
     v.FrameRate=floor(size(t,2)/max(t));
     v.Quality=100;

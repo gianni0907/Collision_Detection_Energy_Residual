@@ -2,6 +2,9 @@ function robot_motion(robot,q,p0,p1,p2,c,r_c,f_ext,T,T2,t,save_video)
 % showing the motion of the robot
 
 if save_video
+    if ~exist("videos/", 'dir')
+       mkdir("videos/")
+    end
     v = VideoWriter("videos/robot.avi");
     v.FrameRate=floor(size(t,2)/max(t));
     v.Quality=100;
@@ -25,7 +28,6 @@ plot3(p1(1),p1(2),p1(3),'.','MarkerSize',18);
 plot3(p2(1),p2(2),p2(3),'.','MarkerSize',18);
 plot3([p0(1),p1(1)],[p0(2),p1(2)],[p0(3),p1(3)],'LineWidth',1.2);
 plot3(c(1)+r_c*cos(2*pi/T2*t_2),c(2)*ones(size(t_2,2),1),c(3)-r_c*sin(2*pi/T2*t_2),'LineWidth',1.2)
-pause
 
 framesPerSecond = floor(size(t,2)/max(t));
 r = rateControl(framesPerSecond);
