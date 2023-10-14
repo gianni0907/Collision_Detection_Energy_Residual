@@ -78,6 +78,8 @@ epsilon = eta*sqrt(lambda_1/lambda_2);
 % set gain values for pd feedback, residual and reduced-order observer
 Kp = 7e1;
 Kd = 7e1;
+Km=150;
+Dm=50;
 
 Ko = 5e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
