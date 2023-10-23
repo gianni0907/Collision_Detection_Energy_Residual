@@ -78,6 +78,9 @@ epsilon = eta*sqrt(lambda_1/lambda_2);
 % set gain values for pd feedback, residual and reduced-order observer
 Kp = 7e1;
 Kd = 7e1;
+Km=250;
+Dm=100;
+Mm=4*diag([7.5 5 2.5]);
 
 Ko = 5e1;
 K0 = c0bar*(vmax+eta)/(2*lambda_1);
@@ -176,7 +179,7 @@ end
 x2hat = reshape(out.x2hat,N,size(out.x_des,3));
 
 t_salient=[t0 t1 t2 t3 t4 t5 5]; % where to have the vertical dashed lines
-save_video = 1;
+save_video = 0;
 
 plot_data(p,dp,p_des,dp_des,f_ext,u_ext,sigma,r,residual_threshold,P_ext,t_salient,t,save_video);
 

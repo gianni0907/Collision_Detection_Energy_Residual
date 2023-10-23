@@ -3,6 +3,7 @@ source/*.pdf
 source/slprj/*
 source/videos/*
 *.slxc
+*.txt
 source/slprj/_sfprj/EMLReport/emlReportAccessInfo.mat
 source/slprj/_sfprj/precompile/autoInferAccessInfo.mat
 source/slprj/_jitprj/jitEngineAccessInfo.mat
