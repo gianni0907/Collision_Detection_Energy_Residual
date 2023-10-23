@@ -176,7 +176,7 @@ end
 x2hat = reshape(out.x2hat,N,size(out.x_des,3));
 
 t_salient=[t0 t1 t2 t3 t4 t5 5]; % where to have the vertical dashed lines
-save_video = 1;
+save_video = 0;
 
 plot_data(p,dp,p_des,dp_des,f_ext,u_ext,sigma,r,residual_threshold,P_ext,t_salient,t,save_video);
 
