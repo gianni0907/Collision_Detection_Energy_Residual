@@ -38,7 +38,7 @@ Further details on the components of the scheme are available in `report.pdf`.
 The structure of the code in `source/` is detailed in the following.
 * `DHMatrix.m`: computes the DH transformation matrices from the DH table
 * `check_in_workspace.m`: given the link lengths l and the point p, checks if the point is inside the workspace.
-* `compute_eeJacbobian.m`: script that generates the following functions
+* `compute_eeJacobian.m`: script that generates the following functions
 	- `get_pee.m` get the end-effector position
  	- `get_Jee.m` get linear part of the end effector jacobian
   	- `get_dJee.m` get the derivative of the linear part of the end effector jacobian
