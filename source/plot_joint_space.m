@@ -3,9 +3,10 @@ function plot_joint_space(q_des,dq_des,q,dq,dq_est,u,u_ext,t_salient,t)
 time_axis = sort([t_salient, 0, 10]);
 
 %% joint positions
-f=figure;
-f.Position=[276.2,77,988.8,658.4];
-set(0,'DefaultLineLineWidth',1)
+figure_configuration_IEEE_standard
+figure;
+% f.Position=[276.2,77,988.8,658.4];
+% set(0,'DefaultLineLineWidth',1)
 
 subplot(4,1,1)
 hold on,grid on,ylabel("$\tau_{ext} \ [Nm]$","Interpreter","Latex");
@@ -46,9 +47,9 @@ legend('$q_{3,d}$','$q_{3}$',"Interpreter","Latex","Location","south","Orientati
 
 %% joint velocities
 % real vs estimated
-f=figure;
-f.Position=[276.2,77,988.8,658.4];
-set(0,'DefaultLineLineWidth',1)
+figure;
+% f.Position=[276.2,77,988.8,658.4];
+% set(0,'DefaultLineLineWidth',1)
 
 subplot(3,1,1)
 hold on,grid on,xlabel("$[s]$","Interpreter","Latex"),ylabel("$[rad/s]$","Interpreter","Latex");
@@ -68,24 +69,26 @@ plot(t,dq_est(3,:));
 legend('$\dot{q}_{3}$','$\hat{\dot{q}}_{3}$',"Interpreter","Latex");
 
 % plot error=actual-estimated velocities
-f=figure;
-f.Position=[276.2000  414.6000  976.8000  320.8000];
-set(0,'DefaultLineLineWidth',1)
+figure;
+% f.Position=[276.2000  414.6000  976.8000  320.8000];
+% set(0,'DefaultLineLineWidth',1)
 
-hold on,grid on,xlabel("$t \ [s]$","Interpreter","Latex"),ylabel("$ \epsilon \ [rad/s]$","Interpreter","Latex");
+hold on,grid on,
 %title("Joint velocity estimation error","Interpreter","Latex");
 plot(t,dq(1,:)-dq_est(1,:));
 plot(t,dq(2,:)-dq_est(2,:));
 plot(t,dq(3,:)-dq_est(3,:));
 xlim([0 max(t)])
+ylim([-0.5 0.5])
 xline(t_salient,'--k');
 xticks(time_axis)
-legend('$\epsilon_{1}$','$\epsilon_{2}$','$\epsilon_{3}$',"Interpreter","Latex");
+xlabel("Time [s]"),ylabel("Estimation error [rad/s]");
+legend('$\epsilon_{1}$','$\epsilon_{2}$','$\epsilon_{3}$',"Interpreter","Latex","Orientation","horizontal");
 
 % real vs desired
-f=figure;
-f.Position=[276.2,77,988.8,658.4];
-set(0,'DefaultLineLineWidth',1)
+figure;
+% f.Position=[276.2,77,988.8,658.4];
+% set(0,'DefaultLineLineWidth',1)
 
 subplot(3,1,1)
 hold on,grid on,xlabel("$[s]$","Interpreter","Latex"),ylabel("$[rad/s]$","Interpreter","Latex");
@@ -104,9 +107,9 @@ plot(t,dq(3,:));
 plot(t,dq_des(3,:));
 legend('$\dot{q}_{3}$','$\dot{q}_{3,d}$',"Interpreter","Latex");
 %% joint torques
-f=figure;
-f.Position=[276.2,77,988.8,658.4];
-set(0,'DefaultLineLineWidth',1)
+figure;
+% f.Position=[276.2,77,988.8,658.4];
+% set(0,'DefaultLineLineWidth',1)
 
 hold on,grid on,xlabel("$[s]$","Interpreter","Latex"),ylabel("$[Nm]$","Interpreter","Latex");
 title("Joint torques","Interpreter","Latex");
@@ -115,9 +118,9 @@ plot(t,u(2,:));
 plot(t,u(3,:));
 legend('$u_{1}$','$u_{2}$','$u_{3}$',"Interpreter","Latex");
 %% joint velocity norm
-f=figure;
-f.Position=[276.2,77,988.8,658.4];
-set(0,'DefaultLineLineWidth',1)
+figure;
+% f.Position=[276.2,77,988.8,658.4];
+% set(0,'DefaultLineLineWidth',1)
 
 hold on,grid on,xlabel("$[s]$","Interpreter","Latex"),ylabel("$|| \dot{q} ||$","Interpreter","Latex");
 title("Joint velocity norm","Interpreter","Latex");
